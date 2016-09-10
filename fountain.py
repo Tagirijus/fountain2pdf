@@ -11,7 +11,7 @@ COMMON_TRANSITIONS = {'FADE OUT.', 'CUT TO BLACK.', 'FADE TO BLACK.'}
 
 
 class FountainElement:
-    def __init__(self, element_type, element_text, section_depth=0, scene_number='', is_centered=False, is_dual_dialogue=False, original_line=0, scene_abbreviation='.', original_content=''):
+    def __init__(self, element_type, element_text='', section_depth=0, scene_number='', is_centered=False, is_dual_dialogue=False, original_line=0, scene_abbreviation='.', original_content=''):
         self.element_type = element_type
         self.element_text = element_text
         self.section_depth = section_depth
@@ -73,6 +73,7 @@ class Fountain:
             full_strip = line.strip()
 
             if (not line or line.isspace()) and not is_comment_block:
+                self.elements.append(FountainElement('Empty Line'))
                 is_inside_dialogue_block = False
                 newlines_before += 1
                 continue

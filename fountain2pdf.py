@@ -1,119 +1,143 @@
 # coding=utf-8
 
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_JUSTIFY
+import fountain2pdf_style_radioplay as style # define your style here
+
+import fountain2pdf_generate_soundlist
+
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.colors import lightgrey, grey
 
-# settings and style
-
-FONT = 'Helvetica'
-SIZE = 14
-INDENT_LEFT = 28
-INDENT_RIGHT = 28
+import sys, os, fountain
 
 
-STYLE_SECTION_HEADING = ParagraphStyle(
-	'Section Heading',
-	fontName=FONT,
-	fontSize=int(SIZE*1.4),
-	leading=int(SIZE*1.4*1.125),
-	alignment=TA_CENTER,
-	spaceAfter=int(SIZE*1.4)
-	)
 
-STYLE_SCENE_NUMBER_L = ParagraphStyle(
-	'Scene Number Left',
-	fontName=FONT+'-Bold',
-	fontSize=SIZE,
-	leading=0,
-	textTransform='uppercase'
-	)
+path_to_project = os.path.dirname(os.path.realpath(__file__))
 
-STYLE_SCENE_HEADING = ParagraphStyle(
-	'Scene Heading',
-	fontName=FONT+'-Bold',
-	fontSize=SIZE,
-	leading=0,
-	leftIndent=int(SIZE*2.5),
-	rightIndent=int(SIZE*2.5),
-	textTransform='uppercase'
-	)
 
-STYLE_SCENE_NUMBER_R = ParagraphStyle(
-	'Scene Number Right',
-	fontName=FONT+'-Bold',
-	fontSize=SIZE,
-	leading=int(SIZE*1.125),
-	spaceAfter=SIZE,
-	alignment=TA_RIGHT,
-	textTransform='uppercase'
-	)
 
-STYLE_ACTION = ParagraphStyle(
-	'Action',
-	fontName=FONT,
-	fontSize=SIZE,
-	leading=int(SIZE*1.125),
-	leftIndent=int(SIZE*2.5),
-	rightIndent=int(SIZE*2.5),
-	spaceAfter=SIZE,
-	textColor=grey
-	)
+# functions
 
-STYLE_CHARACTER = ParagraphStyle(
-	'Character',
-	fontName=FONT,
-	fontSize=SIZE,
-	leading=int(SIZE*1.125),
-	leftIndent=int(SIZE*2.5),
-	rightIndent=int(SIZE*2.5),
-	textTransform='uppercase'
-	)
+def getProgrammParameters(arr):
+	# possible parameters:
+	# 1st parameter: filename of the source fountain file
+	# -c / -char ["Character Name" / "all"] --> marks one char or all in seperate files
+	# -n / -notes --> enables output for comments/notes
+	# -s / -soundlist --> outputs a soundlist only
+	# -i / -index --> enables first page as index of sections and scenes
+	# -d / -numbers --> enables numbers on the sounds / action sentences
 
-STYLE_CHARACTER_MARK = ParagraphStyle(
-	'Character_Mark',
-	fontName=FONT,
-	fontSize=SIZE,
-	leading=int(SIZE*1.125),
-	leftIndent=int(SIZE*2.5),
-	rightIndent=int(SIZE*2.5),
-	textTransform='uppercase',
-	backColor=lightgrey
-	)
+	# quit, if there is not at least one parameter
+	if len(arr) < 2:
+		print 'At least one parameter needed: source fountain file.'
+		exit()
 
-STYLE_DIALOG = ParagraphStyle(
-	'Dialog',
-	fontName=FONT,
-	fontSize=SIZE,
-	leading=int(SIZE*1.125),
-	leftIndent=int(SIZE*2.5)+int(SIZE*1.8),
-	rightIndent=int(SIZE*2.5)
-	)
+	# quit, if the given parameter is not a file
+	if not os.path.isfile(arr[1]):
+		print arr[1] + ' is not a valid file.'
+		exit()
 
-STYLE_DIALOG_MARK = ParagraphStyle(
-	'Dialog Mark',
-	fontName=FONT,
-	fontSize=SIZE,
-	leading=int(SIZE*1.125),
-	leftIndent=int(SIZE*2.5)+int(SIZE*1.8),
-	rightIndent=int(SIZE*2.5),
-	backColor=lightgrey
-	)
+	# check parameters and assign default values
+	output = {}
 
-STYLE_TRANSITION = ParagraphStyle(
-	'Transition',
-	fontName=FONT,
-	fontSize=SIZE,
-	leading=int(SIZE*1.125),
-	leftIndent=int(SIZE*2.5),
-	rightIndent=int(SIZE*2.5),
-	spaceAfter=int(SIZE),
-	textTransform='uppercase',
-	textColor=grey
-	)
+	# the file
+	output['file'] = arr[1]
 
+	# the characters
+	if '-c' in arr:
+		try:
+			output['char'] = arr[arr.index('-c')+1]
+		except Exception:
+			output['char'] = None
+	elif '-char' in arr:
+		try:
+			output['char'] = arr[arr.index('-char')+1]
+		except Exception:
+			output['char'] = None
+	else:
+		output['char'] = None
+
+	# the notes
+	if '-n' in arr or '-notes' in arr:
+		output['notes'] = True
+	else:
+		output['notes'] = False
+
+	# the soundlist
+	if '-s' in arr or '-soundlist' in arr:
+		output['soundlist'] = True
+	else:
+		output['soundlist'] = False
+
+	# the index
+	if '-i' in arr or '-index' in arr:
+		output['index'] = True
+	else:
+		output['index'] = False
+
+	# the nubers
+	if '-d' in arr or '-nubers' in arr:
+		output['nubers'] = True
+	else:
+		output['nubers'] = False
+
+	# return the output
+	return output
+
+
+def zero(number, total):
+	# number has 1 digit
+	if number < 10:
+		if total > 9999:
+			return '0000' + str(number)
+		elif total > 999:
+			return '000' + str(number)
+		elif total > 99:
+			return '00' + str(number)
+		elif total > 9:
+			return '0' + str(number)
+		else:
+			return str(number)
+
+	# number has 2 digits
+	elif number < 100:
+		if total > 9999:
+			return '000' + str(number)
+		elif total > 999:
+			return '00' + str(number)
+		elif total > 99:
+			return '0' + str(number)
+		else:
+			return str(number)
+
+	# number has 3 digits
+	elif number < 1000:
+		if total > 9999:
+			return '00' + str(number)
+		elif total > 999:
+			return '0' + str(number)
+		else:
+			return str(number)
+
+	# number has 4 digits
+	elif number < 10000:
+		if total > 9999:
+			return '0' + str(number)
+		else:
+			return str(number)
+
+
+
+# START THE PROGRAMM
+PAR = getProgrammParameters(sys.argv)
+
+for x in fountain2pdf_generate_soundlist.generateSoundlist(PAR['file']):
+	print x
+
+
+
+
+exit()
+# TEST HERE
 
 # generate doc
 doc = SimpleDocTemplate("test.pdf", pagesize=A4, rightMargin=65, leftMargin=65, topMargin=65, bottomMargin=65)
@@ -121,20 +145,20 @@ doc = SimpleDocTemplate("test.pdf", pagesize=A4, rightMargin=65, leftMargin=65, 
 # fill document
 Story = []
 
-Story.append(Paragraph('<u>Alien (Ernst)</u>', STYLE_SECTION_HEADING))
-Story.append(Paragraph('1', STYLE_SCENE_NUMBER_L))
-Story.append(Paragraph('Station', STYLE_SCENE_HEADING))
-Story.append(Paragraph('1', STYLE_SCENE_NUMBER_R))
-Story.append(Paragraph('<b>(01)</b> Man hört von draußen einen eisigen Windsturm und die Tür wird geschlossen. <b>(02)</b> Mark kommt näher und legt einen schweren Kasten hart auf den Tisch, zieht sich aus und setzt sich dann. <b>(03)</b> Er schaltet ein Aufnahmegerät ein.', STYLE_ACTION))
-Story.append(Paragraph('Mark', STYLE_CHARACTER))
-Story.append(Paragraph('(hektisch)', STYLE_DIALOG))
-Story.append(Paragraph('15:34 Uhr: Ich habe neue Proben aus der Bohrung geholt und beginne jetzt mit den ersten Untersuchungen.', STYLE_DIALOG))
-Story.append(Paragraph('&nbsp;', STYLE_DIALOG))
-Story.append(Paragraph('Cut to:', STYLE_TRANSITION))
-Story.append(Paragraph('2', STYLE_SCENE_NUMBER_L))
-Story.append(Paragraph('Draussen', STYLE_SCENE_HEADING))
-Story.append(Paragraph('2', STYLE_SCENE_NUMBER_R))
-Story.append(Paragraph('<b>(04)</b> Eine neue Szene beginnt jetzt hier!', STYLE_ACTION))
+Story.append(Paragraph('<u><a href="#scene 1">Alien (Ernst)</a></u>', style.STYLE_SECTION_HEADING))
+Story.append(Paragraph('1', style.STYLE_SCENE_NUMBER_L))
+Story.append(Paragraph('Station', style.STYLE_SCENE_HEADING))
+Story.append(Paragraph('1', style.STYLE_SCENE_NUMBER_R))
+Story.append(Paragraph('<b>(01)</b> Man hört von draußen einen eisigen Windsturm und die Tür wird geschlossen. <b>(02)</b> Mark kommt näher und legt einen schweren Kasten hart auf den Tisch, zieht sich aus und setzt sich dann. <b>(03)</b> Er schaltet ein Aufnahmegerät ein.', style.STYLE_ACTION))
+Story.append(Paragraph('Mark', style.STYLE_CHARACTER))
+Story.append(Paragraph('(hektisch)', style.STYLE_DIALOG))
+Story.append(Paragraph('15:34 Uhr: Ich habe neue Proben aus der Bohrung geholt und beginne jetzt mit den ersten Untersuchungen.', style.STYLE_DIALOG))
+Story.append(Paragraph('&nbsp;', style.STYLE_DIALOG))
+Story.append(Paragraph('Cut to:', style.STYLE_TRANSITION))
+Story.append(Paragraph('2', style.STYLE_SCENE_NUMBER_L))
+Story.append(Paragraph('Draussen', style.STYLE_SCENE_HEADING))
+Story.append(Paragraph('2', style.STYLE_SCENE_NUMBER_R))
+Story.append(Paragraph('<b>(04)</b> Eine neue Szene beginnt jetzt <a name="scene 1" />hier!', style.STYLE_ACTION))
 
 
 # finally build the document and save it
