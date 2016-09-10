@@ -363,7 +363,7 @@ def Fountain2SoundlistPDF(fount):
 			if loc in sfx.locations:
 				Story.append(Paragraph(loc, style.STYLE_SOUNDLIST_LOCATION))
 				Story.append(Paragraph('&nbsp;', style.STYLE_SOUNDLIST_LOCATION))
-				Story.append(Paragraph(sfx.scenenumber + ' ' + sfx.scene + ' ' + sfx.scenenumber, style.STYLE_SOUNDLIST_SCENE))
+				Story.append(Paragraph(sfx.scenenumber + ' - ' + sfx.scene + ' - ' + sfx.scenenumber, style.STYLE_SOUNDLIST_SCENE))
 				Story.append(Paragraph( '( ' + zero(sfx.number,AMOUNT) + ' )  ' + sfx.sound, style.STYLE_SOUNDLIST_SOUND))
 				Story.append(PageBreak())
 
