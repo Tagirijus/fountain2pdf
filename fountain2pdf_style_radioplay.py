@@ -7,23 +7,32 @@ from reportlab.lib.colors import lightgrey, grey
 # settings and style
 
 FONT = 'Helvetica'
+FONTITALIC = 'Helvetica-Oblique'
+FONTBOLD = 'Helvetica-Bold'
 SIZE = 14
 INDENT_LEFT = 28
 INDENT_RIGHT = 28
+PRINT_EMPTY_LINES = True
 
+RIGHTMARGIN = 65
+LEFTMARGIN = 65
+TOPMARGIN = 65
+BOTTOMMARGIN = 65
+
+SCENE_NUMBER_L = True
+SCENE_NUMBER_R = True
 
 STYLE_SECTION_HEADING = ParagraphStyle(
 	'Section Heading',
 	fontName=FONT,
 	fontSize=int(SIZE*1.4),
 	leading=int(SIZE*1.4*1.125),
-	alignment=TA_CENTER,
-	spaceAfter=int(SIZE*1.4)
+	alignment=TA_CENTER
 	)
 
 STYLE_SCENE_NUMBER_L = ParagraphStyle(
 	'Scene Number Left',
-	fontName=FONT+'-Bold',
+	fontName=FONTBOLD,
 	fontSize=SIZE,
 	leading=0,
 	textTransform='uppercase'
@@ -31,7 +40,7 @@ STYLE_SCENE_NUMBER_L = ParagraphStyle(
 
 STYLE_SCENE_HEADING = ParagraphStyle(
 	'Scene Heading',
-	fontName=FONT+'-Bold',
+	fontName=FONTBOLD,
 	fontSize=SIZE,
 	leading=0,
 	leftIndent=int(SIZE*2.5),
@@ -41,12 +50,22 @@ STYLE_SCENE_HEADING = ParagraphStyle(
 
 STYLE_SCENE_NUMBER_R = ParagraphStyle(
 	'Scene Number Right',
-	fontName=FONT+'-Bold',
+	fontName=FONTBOLD,
 	fontSize=SIZE,
 	leading=int(SIZE*1.125),
-	spaceAfter=SIZE,
 	alignment=TA_RIGHT,
 	textTransform='uppercase'
+	)
+
+STYLE_COMMENT = ParagraphStyle(
+	'Comment',
+	fontName=FONTITALIC,
+	fontSize=int(SIZE*0.7),
+	leading=int(SIZE*0.7),
+	leftIndent=int(SIZE*6),
+	rightIndent=int(SIZE*6),
+	textColor=grey,
+	alignment=TA_CENTER
 	)
 
 STYLE_ACTION = ParagraphStyle(
@@ -56,7 +75,6 @@ STYLE_ACTION = ParagraphStyle(
 	leading=int(SIZE*1.125),
 	leftIndent=int(SIZE*2.5),
 	rightIndent=int(SIZE*2.5),
-	spaceAfter=SIZE,
 	textColor=grey
 	)
 
@@ -81,8 +99,27 @@ STYLE_CHARACTER_MARK = ParagraphStyle(
 	backColor=lightgrey
 	)
 
-STYLE_DIALOG = ParagraphStyle(
-	'Dialog',
+STYLE_PARENTHETICAL = ParagraphStyle(
+	'Parenthetical',
+	fontName=FONTITALIC,
+	fontSize=SIZE,
+	leading=int(SIZE*1.125),
+	leftIndent=int(SIZE*2.5)+int(SIZE*1.8),
+	rightIndent=int(SIZE*2.5)
+	)
+
+STYLE_PARENTHETICAL_MARK = ParagraphStyle(
+	'Parenthetical Mark',
+	fontName=FONTITALIC,
+	fontSize=SIZE,
+	leading=int(SIZE*1.125),
+	leftIndent=int(SIZE*2.5)+int(SIZE*1.8),
+	rightIndent=int(SIZE*2.5),
+	backColor=lightgrey
+	)
+
+STYLE_DIALOGUE = ParagraphStyle(
+	'Dialogue',
 	fontName=FONT,
 	fontSize=SIZE,
 	leading=int(SIZE*1.125),
@@ -90,8 +127,8 @@ STYLE_DIALOG = ParagraphStyle(
 	rightIndent=int(SIZE*2.5)
 	)
 
-STYLE_DIALOG_MARK = ParagraphStyle(
-	'Dialog Mark',
+STYLE_DIALOGUE_MARK = ParagraphStyle(
+	'Dialogue Mark',
 	fontName=FONT,
 	fontSize=SIZE,
 	leading=int(SIZE*1.125),
@@ -107,7 +144,16 @@ STYLE_TRANSITION = ParagraphStyle(
 	leading=int(SIZE*1.125),
 	leftIndent=int(SIZE*2.5),
 	rightIndent=int(SIZE*2.5),
-	spaceAfter=int(SIZE),
 	textTransform='uppercase',
-	textColor=grey
+	textColor=grey,
+	alignment=TA_CENTER
+	)
+
+STYLE_EMPTY_LINE = ParagraphStyle(
+	'Empty Line',
+	fontName=FONT,
+	fontSize=SIZE,
+	leading=SIZE,
+	leftIndent=int(SIZE*2.5),
+	rightIndent=int(SIZE*2.5)
 	)

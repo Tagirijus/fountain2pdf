@@ -5,7 +5,7 @@ import fountain2pdf_style_radioplay as style # define your style here
 import fountain2pdf_generate_soundlist
 from fountain2pdf_2html import Fountain2HTML
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
 from reportlab.lib.pagesizes import A4
 
 import sys, os, fountain
@@ -127,46 +127,169 @@ def zero(number, total):
 			return str(number)
 
 
+def getCharacters(fount):
+	chars = []
+
+	# iterate through elements
+	for f in fount.elements:
+		if f.element_type == 'Character' and f.element_text.upper() not in chars:
+			chars.append( f.element_text.upper() )
+
+	return chars
+
+
+def Fountain2PDF(fount, char=None):
+	# generate filename
+	if char and char.upper() in getCharacters(fount):
+		char = char.upper()
+		out_filename = PAR['file'].replace('.fountain', '_'+char.replace(' ', '_')+'.pdf')
+		mark = True
+	else:
+		out_filename = PAR['file'].replace('.fountain', '.pdf')
+		mark = False
+
+
+	# generate doc and empty output-array
+	doc = SimpleDocTemplate(out_filename, pagesize=A4, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
+	Story = []
+
+	# iterate through every fountain element
+	skip_empty_line = False
+	mark_char = False
+	section_count = 1
+	scene_count = 1
+	for f in fount.elements:
+
+		# it is a section heading
+		if f.element_type == 'Section Heading':
+			# generate anchor for index linking for sections
+			tmp_section_anchor = '<a name="section' + str(section_count) + '" />'
+			section_count += 1
+			Story.append(Paragraph( tmp_section_anchor + f.element_text, style.STYLE_SECTION_HEADING))
+			skip_empty_line = False
+
+		# it is a scene heading
+		elif f.element_type == 'Scene Heading':
+			# print scene number on the left, if enabled
+			if style.SCENE_NUMBER_L:
+				Story.append(Paragraph( f.scene_number, style.STYLE_SCENE_NUMBER_L))
+			# get scene abbreviation and print it, if it is not a dot
+			tmp_scene_abb = f.scene_abbreviation + ' ' if f.scene_abbreviation != '.' else ''
+			# generate anchor for index linking for scenes
+			tmp_scene_anchor = '<a name="scene' + str(scene_count) + '" />'
+			scene_count += 1
+			Story.append(Paragraph( tmp_scene_anchor + tmp_scene_abb + f.element_text, style.STYLE_SCENE_HEADING))
+			# print scene number on the left, if enabled
+			if style.SCENE_NUMBER_R:
+				Story.append(Paragraph( f.scene_number, style.STYLE_SCENE_NUMBER_R))
+			skip_empty_line = False
+
+		# it is a comment / a note
+		elif f.element_type == 'Comment':
+			if PAR['notes']:
+				Story.append(Paragraph( '[ ' + Fountain2HTML( f.element_text ) + ' ]', style.STYLE_COMMENT))
+			else:
+				skip_empty_line = True
+
+		# it is action
+		elif f.element_type == 'Action':
+			Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_ACTION))
+			skip_empty_line = False
+
+		# it is a character
+		elif f.element_type == 'Character':
+			if mark and f.element_text == char:
+				Story.append(Paragraph( f.element_text, style.STYLE_CHARACTER_MARK))
+				mark_char = True
+			else:
+				Story.append(Paragraph( f.element_text, style.STYLE_CHARACTER))
+				mark_char = False
+			skip_empty_line = False
+
+		# it is a parenthetical
+		elif f.element_type == 'Parenthetical':
+			if mark and mark_char:
+				Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL_MARK))
+			else:
+				Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL))
+			skip_empty_line = False
+
+		# it is dialogue
+		elif f.element_type == 'Dialogue':
+			if mark and mark_char:
+				Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE_MARK))
+			else:
+				Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE))
+			skip_empty_line = False
+
+		# it is a transition
+		elif f.element_type == 'Transition':
+			Story.append(Paragraph( f.element_text, style.STYLE_TRANSITION))
+			skip_empty_line = False
+
+		# it is an empty line
+		elif f.element_type == 'Empty Line':
+			if style.PRINT_EMPTY_LINES and not skip_empty_line:
+				Story.append(Paragraph('&nbsp;', style.STYLE_EMPTY_LINE))
+				skip_empty_line = False
+
+		# it is a page break
+		elif f.element_type == 'Page Break':
+			Story.append(PageBreak())
+			skip_empty_line = False
+
+		# it is a synopsis
+		elif f.element_type == 'Synopsis':
+			# TO DO !!!
+			pass
+			#skip_empty_line = False
+
+		# it is a boneyard
+		elif f.element_type == 'Boneyard':
+			# TO DO !!!
+			pass
+			#skip_empty_line = False
+
+	# get title and save to PDF
+	doc.title = PAR['file'].replace('.fountain', '')
+	doc.build(Story)
+
+
+
 
 
 
 
 # START THE PROGRAMM
+
+# get parameter settings
 PAR = getProgrammParameters(sys.argv)
 
+# get fountain file
+d = open(PAR['file'], 'r')
+F = fountain.Fountain( d.read() )
+d.close()
+
+
+# check if it should output soundlist or not
+if PAR['soundlist']:
+	print 'Soundlist generating still in development.'
+
+# do normal script rendering
+else:
+
+	# check if it should output all characters automatically or not
+	if PAR['char'] == 'all':
+		Fountain2PDF(F)
+		for x in getCharacters(F):
+			Fountain2PDF(F, x)
+
+	# make a single script render
+	else:
+		Fountain2PDF(F, PAR['char'])
+
+
+
+# TODO: SOUNDLIST
 # for x in fountain2pdf_generate_soundlist.generateSoundlist(PAR['file']):
 # 	print x
-
-print Fountain2HTML('Hallo hier ist der Manuel!')
-
-
-
-
-exit()
-# TEST HERE
-
-# generate doc
-doc = SimpleDocTemplate("test.pdf", pagesize=A4, rightMargin=65, leftMargin=65, topMargin=65, bottomMargin=65)
-
-# fill document
-Story = []
-
-Story.append(Paragraph('<u><a href="#scene 1">Alien (Ernst)</a></u>', style.STYLE_SECTION_HEADING))
-Story.append(Paragraph('1', style.STYLE_SCENE_NUMBER_L))
-Story.append(Paragraph('Station', style.STYLE_SCENE_HEADING))
-Story.append(Paragraph('1', style.STYLE_SCENE_NUMBER_R))
-Story.append(Paragraph('<b>(01)</b> Man hört von draußen einen eisigen Windsturm und die Tür wird geschlossen. <b>(02)</b> Mark kommt näher und legt einen schweren Kasten hart auf den Tisch, zieht sich aus und setzt sich dann. <b>(03)</b> Er schaltet ein Aufnahmegerät ein.', style.STYLE_ACTION))
-Story.append(Paragraph('Mark', style.STYLE_CHARACTER))
-Story.append(Paragraph('(hektisch)', style.STYLE_DIALOG))
-Story.append(Paragraph('15:34 Uhr: Ich habe neue Proben aus der Bohrung geholt und beginne jetzt mit den ersten Untersuchungen.', style.STYLE_DIALOG))
-Story.append(Paragraph('&nbsp;', style.STYLE_DIALOG))
-Story.append(Paragraph('Cut to:', style.STYLE_TRANSITION))
-Story.append(Paragraph('2', style.STYLE_SCENE_NUMBER_L))
-Story.append(Paragraph('Draussen', style.STYLE_SCENE_HEADING))
-Story.append(Paragraph('2', style.STYLE_SCENE_NUMBER_R))
-Story.append(Paragraph('<b>(04)</b> Eine neue Szene beginnt jetzt <a name="scene 1" />hier!', style.STYLE_ACTION))
-
-
-# finally build the document and save it
-doc.title = 'Alien (Ernst)'
-doc.build(Story)

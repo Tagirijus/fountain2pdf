@@ -2,6 +2,23 @@
 
 import re
 
+class Underline(object):
+
+	parse_re = re.compile(
+		# underline
+		r'_'
+		# must not be followed by space
+		r'(?=\S)'
+		# inside text
+		r'([^_]+)'
+		# finishing with underline
+		r'(?<=\S)_'
+	)
+
+	start_html = '<u>'
+	end_html = '</u>'
+
+
 class Italic(object):
 
 	parse_re = re.compile(
@@ -53,24 +70,24 @@ class BoldItalic(object):
 	end_html = '</em></strong>'
 
 
-class Underline(object):
+class Asteriks(object):
 
 	parse_re = re.compile(
-		# underline
-		r'_'
+		# one slash and one star
+		r'\\\*'
 		# must not be followed by space
 		r'(?=\S)'
 		# inside text
-		r'([^_]+)'
-		# finishing with underline
-		r'(?<=\S)_'
+		r'(.+?[*_]*)'
+		# finishing with one slash and one star
+		r'(?<=\S)\\\*'
 	)
 
-	start_html = '<u>'
-	end_html = '</u>'
+	start_html = '&#42;'
+	end_html = '&#42;'
 
 
-styles = (BoldItalic, Bold, Italic, Underline)
+styles = (Asteriks, BoldItalic, Bold, Italic, Underline)
 
 def Fountain2HTML(text):
 	out = text
