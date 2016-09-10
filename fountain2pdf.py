@@ -135,7 +135,6 @@ def getCharacters(fount):
 	for f in fount.elements:
 		if f.element_type == 'Character' and f.element_text.upper() not in chars:
 			chars.append( f.element_text.upper() )
-	print 'DEBUG:', chars
 	return chars
 
 
