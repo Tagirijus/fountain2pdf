@@ -5,10 +5,11 @@ import fountain2pdf_style_radioplay as style # define your style here
 import fountain2pdf_generate_soundlist
 from fountain2pdf_2html import Fountain2HTML
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak
 from reportlab.lib.pagesizes import A4
 
-import sys, os, fountain
+import sys, os, fountain, re
 
 
 
@@ -75,11 +76,11 @@ def getProgrammParameters(arr):
 	else:
 		output['index'] = False
 
-	# the nubers
-	if '-d' in arr or '-nubers' in arr:
-		output['nubers'] = True
+	# the numbers
+	if '-d' in arr or '-numbers' in arr:
+		output['numbers'] = True
 	else:
-		output['nubers'] = False
+		output['numbers'] = False
 
 	# return the output
 	return output
@@ -134,8 +135,37 @@ def getCharacters(fount):
 	for f in fount.elements:
 		if f.element_type == 'Character' and f.element_text.upper() not in chars:
 			chars.append( f.element_text.upper() )
-
+	print 'DEBUG:', chars
 	return chars
+
+
+def countActionSentences(fount):
+	count = 0
+	for x in fount.elements:
+		if x.element_type == 'Action':
+			for sentence in re.split('(?<=[.!?]) +', x.element_text):
+				count += 1
+	return count
+
+
+def generateIndex(fount):
+	# generates an index with linking from section and scene headings
+	# TODO: Does not work with links over the same page !!!
+
+	out = []
+	section_count = 1
+	scene_count = 1
+	out.append(Paragraph(PAR['file'].replace('.fountain', ''),style.STYLE_INDEX_TITEL))
+	for f in fount.elements:
+		if f.element_type == 'Section Heading':
+			out.append(Paragraph( '<a href="document:section' + str(section_count) + '"><u>' + f.element_text + '</u></a>', style.STYLE_INDEX_SECTION ))
+			section_count += 1
+		elif f.element_type == 'Scene Heading':
+			out.append(Paragraph( '<a href="document:scene' + str(scene_count) + '"><u>' + f.element_text + ' # ' + f.scene_number + '</u></a>', style.STYLE_INDEX_SCENE ))
+			scene_count += 1
+	out.append(PageBreak())
+
+	return out
 
 
 def Fountain2PDF(fount, char=None):
@@ -153,11 +183,19 @@ def Fountain2PDF(fount, char=None):
 	doc = SimpleDocTemplate(out_filename, pagesize=A4, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
 	Story = []
 
-	# iterate through every fountain element
+	# make index, if enabled
+	if PAR['index']:
+		Story = generateIndex(fount)
+
+	# some variables before iteration starts
 	skip_empty_line = False
 	mark_char = False
 	section_count = 1
 	scene_count = 1
+	action_sentence = 1
+	action_total = countActionSentences(fount)
+
+	# iterate through every fountain element
 	for f in fount.elements:
 
 		# it is a section heading
@@ -193,7 +231,19 @@ def Fountain2PDF(fount, char=None):
 
 		# it is action
 		elif f.element_type == 'Action':
-			Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_ACTION))
+			tmp_action = ''
+			if PAR['numbers']:
+				RE = re.split('(?<=[.!?]) +', f.element_text)
+				for sentnum, sentence in enumerate(RE):
+					if sentnum >= 0 and sentnum <= len(RE):
+						tmp_space = ' '
+					else:
+						tmp_space = ''
+					tmp_action += '<strong>' + zero(action_sentence, action_total) + ':</strong> ' + sentence + tmp_space
+					action_sentence += 1
+			else:
+				tmp_action = f.element_text
+			Story.append(Paragraph( Fountain2HTML( tmp_action ), style.STYLE_ACTION))
 			skip_empty_line = False
 
 		# it is a character
@@ -251,9 +301,75 @@ def Fountain2PDF(fount, char=None):
 			#skip_empty_line = False
 
 	# get title and save to PDF
-	doc.title = PAR['file'].replace('.fountain', '')
-	doc.build(Story)
+	if char:
+		doc.title = PAR['file'].replace('.fountain', ': ' + char)
+	else:
+		doc.title = PAR['file'].replace('.fountain', '')
+	doc.build(Story, canvasmaker=NumberedCanvas)
 
+
+class NumberedCanvas(canvas.Canvas):
+	def __init__(self, *args, **kwargs):
+		canvas.Canvas.__init__(self, *args, **kwargs)
+		self._saved_page_states = []
+
+	def showPage(self):
+		self._saved_page_states.append(dict(self.__dict__))
+		self._startPage()
+
+	def save(self):
+		"""add page info to each page (page x of y)"""
+		num_pages = len(self._saved_page_states)
+		for state in self._saved_page_states:
+			self.__dict__.update(state)
+			self.draw_page_number(num_pages)
+			canvas.Canvas.showPage(self)
+		canvas.Canvas.save(self)
+
+	def draw_page_number(self, page_count):
+		self.setFont(style.FONT, style.SIZE)
+		self.setFillColorRGB(.5,.5,.5)
+		self.drawRightString(570, 20,
+			"%d / %d" % (self._pageNumber, page_count))
+
+
+def getLocations(SFXList):
+	locs = []
+	for x in SFXList:
+		for y in x.locations:
+			if y not in locs:
+				locs.append(y)
+	return locs
+
+def Fountain2SoundlistPDF(fount):
+	# get / generate list of sounds
+	SOUNDS = fountain2pdf_generate_soundlist.generateSoundlist(PAR['file'])
+	AMOUNT = len(SOUNDS)
+
+	# get locations
+	LOCATIONS = getLocations( SOUNDS )
+
+	# generate doc and empty output-array
+	doc = SimpleDocTemplate(PAR['file'].replace('.fountain', '_SFX.pdf'), pagesize=A4, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
+	Story = []
+
+	# iterate through locations and add sounds to the pages
+	for loc in LOCATIONS:
+		Story.append(Paragraph('Location:<br /><br /><br /><b>' + loc + '</b>', style.STYLE_SOUNDLIST_LOCATION_HEAD))
+		Story.append(PageBreak())
+
+		# iter through all sounds and add one sound per page, if it's in the location
+		for sfx in SOUNDS:
+			if loc in sfx.locations:
+				Story.append(Paragraph(loc, style.STYLE_SOUNDLIST_LOCATION))
+				Story.append(Paragraph('&nbsp;', style.STYLE_SOUNDLIST_LOCATION))
+				Story.append(Paragraph(sfx.scenenumber + ' ' + sfx.scene + ' ' + sfx.scenenumber, style.STYLE_SOUNDLIST_SCENE))
+				Story.append(Paragraph( '( ' + zero(sfx.number,AMOUNT) + ' )  ' + sfx.sound, style.STYLE_SOUNDLIST_SOUND))
+				Story.append(PageBreak())
+
+	# get title and save to PDF
+	doc.title = PAR['file'].replace('.fountain', ': SFX')
+	doc.build(Story, canvasmaker=NumberedCanvas)
 
 
 
@@ -273,7 +389,7 @@ d.close()
 
 # check if it should output soundlist or not
 if PAR['soundlist']:
-	print 'Soundlist generating still in development.'
+	Fountain2SoundlistPDF(F)
 
 # do normal script rendering
 else:
@@ -287,9 +403,3 @@ else:
 	# make a single script render
 	else:
 		Fountain2PDF(F, PAR['char'])
-
-
-
-# TODO: SOUNDLIST
-# for x in fountain2pdf_generate_soundlist.generateSoundlist(PAR['file']):
-# 	print x

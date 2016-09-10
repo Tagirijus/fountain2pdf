@@ -9,7 +9,8 @@ from reportlab.lib.colors import lightgrey, grey
 FONT = 'Helvetica'
 FONTITALIC = 'Helvetica-Oblique'
 FONTBOLD = 'Helvetica-Bold'
-SIZE = 14
+FONTBOLDITALIC = 'Helvetica-BoldOblique'
+SIZE = 16
 INDENT_LEFT = 28
 INDENT_RIGHT = 28
 PRINT_EMPTY_LINES = True
@@ -88,6 +89,24 @@ STYLE_CHARACTER = ParagraphStyle(
 	textTransform='uppercase'
 	)
 
+STYLE_PARENTHETICAL = ParagraphStyle(
+	'Parenthetical',
+	fontName=FONTITALIC,
+	fontSize=SIZE,
+	leading=int(SIZE*1.125),
+	leftIndent=int(SIZE*2.5)+int(SIZE*1.8),
+	rightIndent=int(SIZE*2.5)
+	)
+
+STYLE_DIALOGUE = ParagraphStyle(
+	'Dialogue',
+	fontName=FONT,
+	fontSize=SIZE,
+	leading=int(SIZE*1.125),
+	leftIndent=int(SIZE*2.5)+int(SIZE*1.8),
+	rightIndent=int(SIZE*2.5)
+	)
+
 STYLE_CHARACTER_MARK = ParagraphStyle(
 	'Character_Mark',
 	fontName=FONT,
@@ -97,15 +116,6 @@ STYLE_CHARACTER_MARK = ParagraphStyle(
 	rightIndent=int(SIZE*2.5),
 	textTransform='uppercase',
 	backColor=lightgrey
-	)
-
-STYLE_PARENTHETICAL = ParagraphStyle(
-	'Parenthetical',
-	fontName=FONTITALIC,
-	fontSize=SIZE,
-	leading=int(SIZE*1.125),
-	leftIndent=int(SIZE*2.5)+int(SIZE*1.8),
-	rightIndent=int(SIZE*2.5)
 	)
 
 STYLE_PARENTHETICAL_MARK = ParagraphStyle(
@@ -118,14 +128,6 @@ STYLE_PARENTHETICAL_MARK = ParagraphStyle(
 	backColor=lightgrey
 	)
 
-STYLE_DIALOGUE = ParagraphStyle(
-	'Dialogue',
-	fontName=FONT,
-	fontSize=SIZE,
-	leading=int(SIZE*1.125),
-	leftIndent=int(SIZE*2.5)+int(SIZE*1.8),
-	rightIndent=int(SIZE*2.5)
-	)
 
 STYLE_DIALOGUE_MARK = ParagraphStyle(
 	'Dialogue Mark',
@@ -157,3 +159,88 @@ STYLE_EMPTY_LINE = ParagraphStyle(
 	leftIndent=int(SIZE*2.5),
 	rightIndent=int(SIZE*2.5)
 	)
+
+STYLE_INDEX_TITEL = ParagraphStyle(
+	'Index Title',
+	fontName=FONTBOLD,
+	fontSize=int(SIZE*3),
+	leading=int(SIZE*6),
+	alignment=TA_CENTER,
+	textTransform='uppercase'
+)
+
+STYLE_INDEX_SECTION = ParagraphStyle(
+	'Index Section',
+	fontName=FONT,
+	fontSize=int(SIZE*1.5),
+	leading=int(SIZE*2),
+	leftIndent=int(SIZE*2.5),
+	rightIndent=int(SIZE*2.5)
+)
+
+STYLE_INDEX_SCENE = ParagraphStyle(
+	'Index Scene',
+	fontName=FONT,
+	fontSize=int(SIZE*1.5),
+	leading=int(SIZE*2),
+	leftIndent=int(SIZE*4),
+	rightIndent=int(SIZE*4)
+)
+
+STYLE_SOUNDLIST_LOCATION_HEAD = ParagraphStyle(
+	'Soundlist Location Head',
+	fontName=FONT,
+	fontSize=int(SIZE*4),
+	leading=int(SIZE*4),
+	alignment=TA_CENTER
+)
+
+STYLE_SOUNDLIST_LOCATION = ParagraphStyle(
+	'Soundlist Location',
+	fontName=FONT,
+	fontSize=int(SIZE*1.5),
+	leading=int(SIZE*2)
+)
+
+STYLE_SOUNDLIST_SCENE = ParagraphStyle(
+	'Soundlist Scene',
+	fontName=FONT,
+	fontSize=int(SIZE*2),
+	leading=int(SIZE*6)
+)
+
+STYLE_SOUNDLIST_SOUND = ParagraphStyle(
+	'Soundlist Sound',
+	fontName=FONT,
+	fontSize=int(SIZE*2.5),
+	leading=int(SIZE*3)
+)
+
+
+
+# DEFAULT PARAGRAPH STYLE:
+#
+# fontName='Times-Roman',
+# fontSize=10,
+# leading=12,
+# leftIndent=0,
+# rightIndent=0,
+# firstLineIndent=0,
+# alignment=TA_LEFT,
+# spaceBefore=0,
+# spaceAfter=0,
+# bulletFontName='Times-Roman',
+# bulletFontSize=10,
+# bulletIndent=0,
+# textColor= black,
+# backColor=None,
+# wordWrap=None,
+# borderWidth= 0,
+# borderPadding= 0,
+# borderColor= None,
+# borderRadius= None,
+# allowWidows= 1,
+# allowOrphans= 0,
+# textTransform=None,  # 'uppercase' | 'lowercase' | None
+# endDots=None,
+# splitLongWords=1,
