@@ -3,6 +3,7 @@
 import fountain2pdf_style_radioplay as style # define your style here
 
 import fountain2pdf_generate_soundlist
+from fountain2pdf_2html import Fountain2HTML
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.pagesizes import A4
@@ -127,11 +128,16 @@ def zero(number, total):
 
 
 
+
+
+
 # START THE PROGRAMM
 PAR = getProgrammParameters(sys.argv)
 
-for x in fountain2pdf_generate_soundlist.generateSoundlist(PAR['file']):
-	print x
+# for x in fountain2pdf_generate_soundlist.generateSoundlist(PAR['file']):
+# 	print x
+
+print Fountain2HTML('Hallo hier ist der Manuel!')
 
 
 
