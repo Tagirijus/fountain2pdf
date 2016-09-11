@@ -131,26 +131,28 @@ def generateSoundlist(datei):
 			i = get_id(sounds, x.scene, x.scenenumber, x.sound)
 			sounds[i].locations = x.locations
 			sounds[i].comment = x.comment
-			sounds[i].done = True
+			sounds[i].done = x.done
 
 
 	# asking user stuff and generating the list
 	skip = False
-	skipto = 0
+	skipto = -1
 	for x in sounds:
-		# check if entry already exists in liste
+		# skip mechanism and check if entry already exists in liste ... skip or not
 		if skipto > 0 and skipto != x.number:
 			done = True
 			skip = True
 		elif skipto == x.number:
 			done = x.done
 			skip = False
-			skipto = 0
+			skipto = -1
 		else:
 			done = x.done
-			skipto = 0
+			skipto = -1
 		if skip and done:
 			continue
+
+		# don't skip
 		else:
 			if done:
 				default 	= ', '.join( x.locations )
@@ -180,7 +182,7 @@ def generateSoundlist(datei):
 			try:
 				skipto = int(user[1:])
 			except Exception:
-				skipto = 0
+				skipto = -1
 		elif user == 'print':
 			break
 		else:
