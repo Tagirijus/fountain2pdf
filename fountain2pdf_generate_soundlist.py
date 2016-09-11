@@ -140,7 +140,7 @@ def generateSoundlist(datei):
 	# asking user stuff and generating the list
 	skip = False
 	THIS = 0
-	while THIS <= len(sounds):
+	while THIS < len(sounds):
 		# skip mechanism ... skip or not
 		done = sounds[THIS].done
 		if skip and done:

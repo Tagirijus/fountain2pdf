@@ -6,8 +6,7 @@ import fountain2pdf_generate_soundlist
 from fountain2pdf_2html import Fountain2HTML
 
 from reportlab.pdfgen import canvas
-from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak
-from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer
 
 import sys, os, fountain, re
 
@@ -167,6 +166,79 @@ def generateIndex(fount):
 	return out
 
 
+def getParaHeight(para, withspace=True):
+	height = 0
+	if withspace:
+		height += para.getSpaceBefore()
+		height += para.getSpaceAfter()
+
+	height += para.wrap( style.DOC_SIZE[0], style.DOC_SIZE[1] )[1]
+
+	return height
+
+
+def generateTitlepage(fount):
+	# generate title page
+	at_least_one_metadata = False
+	para_title = None
+	para_credit = None
+	para_author = None
+	para_date = None
+	para_contact = None
+	left_space = style.DOC_SIZE[1] - style.TOPMARGIN - style.BOTTOMMARGIN - style.SIZE
+	for meta in fount.metadata.iteritems():
+		# get title
+		if meta[0] == 'title':
+			at_least_one_metadata = True
+			para_title = Paragraph( Fountain2HTML( '<br />' + '<br />' + '<br />'.join(meta[1]) ) , style.STYLE_TITLEPAGE_TITLE)
+			left_space -= getParaHeight(para_title)
+
+		# get credit
+		elif meta[0] == 'credit' or meta[0] == 'credits':
+			at_least_one_metadata = True
+			para_credit = Paragraph( Fountain2HTML( '<br />'.join(meta[1]) ) , style.STYLE_TITLEPAGE_CREDIT)
+			left_space -= getParaHeight(para_credit)
+
+		# get author
+		elif meta[0] == 'author' or meta[0] == 'authors':
+			at_least_one_metadata = True
+			para_author = Paragraph( Fountain2HTML( '<br />'.join(meta[1]) ) , style.STYLE_TITLEPAGE_AUTHOR)
+			left_space -= getParaHeight(para_author)
+
+		# get date
+		elif meta[0] == 'date':
+			at_least_one_metadata = True
+			para_date = Paragraph( Fountain2HTML( '<br />'.join(meta[1]) ) , style.STYLE_TITLEPAGE_DATE)
+			left_space -= getParaHeight(para_date)
+
+		# get contact
+		elif meta[0] == 'contact':
+			at_least_one_metadata = True
+			para_contact = Paragraph( Fountain2HTML( '<br />'.join(meta[1]) ) , style.STYLE_TITLEPAGE_CONTACT)
+			left_space -= getParaHeight(para_contact)
+
+	# output
+	out = []
+	if at_least_one_metadata:
+		if para_title:
+			out.append( para_title )
+		if para_credit:
+			out.append( para_credit )
+		if para_author:
+			out.append( para_author )
+		if para_date:
+			out.append(Spacer(0, left_space))
+			out.append( para_date )
+		if not para_date and para_contact:
+			out.append(Spacer(0, left_space))
+			out.append( para_contact )
+		elif para_date and para_contact:
+			out.append( para_contact )
+		out.append(PageBreak())
+
+	return out
+
+
 def Fountain2PDF(fount, char=None):
 	# generate filename
 	if char and char.upper() in getCharacters(fount):
@@ -179,12 +251,15 @@ def Fountain2PDF(fount, char=None):
 
 
 	# generate doc and empty output-array
-	doc = SimpleDocTemplate(out_filename, pagesize=A4, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
+	doc = SimpleDocTemplate(out_filename, pagesize=style.DOC_SIZE, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
 	Story = []
+
+	# make titlepage
+	Story.extend( generateTitlepage(fount) )
 
 	# make index, if enabled
 	if PAR['index']:
-		Story = generateIndex(fount)
+		Story.extend( generateIndex(fount) )
 
 	# some variables before iteration starts
 	skip_empty_line = False
@@ -209,7 +284,7 @@ def Fountain2PDF(fount, char=None):
 		elif f.element_type == 'Scene Heading':
 			# print scene number on the left, if enabled
 			if style.SCENE_NUMBER_L:
-				Story.append(Paragraph( f.scene_number, style.STYLE_SCENE_NUMBER_L))
+				Story.append(Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_L))
 			# get scene abbreviation and print it, if it is not a dot
 			tmp_scene_abb = f.scene_abbreviation + ' ' if f.scene_abbreviation != '.' else ''
 			# generate anchor for index linking for scenes
@@ -218,7 +293,7 @@ def Fountain2PDF(fount, char=None):
 			Story.append(Paragraph( tmp_scene_anchor + tmp_scene_abb + f.element_text, style.STYLE_SCENE_HEADING))
 			# print scene number on the left, if enabled
 			if style.SCENE_NUMBER_R:
-				Story.append(Paragraph( f.scene_number, style.STYLE_SCENE_NUMBER_R))
+				Story.append(Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_R))
 			skip_empty_line = False
 
 		# it is a comment / a note
@@ -349,7 +424,7 @@ def Fountain2SoundlistPDF(fount):
 	LOCATIONS = sorted(getLocations( SOUNDS ))
 
 	# generate doc and empty output-array
-	doc = SimpleDocTemplate(PAR['file'].replace('.fountain', '_SFX.pdf'), pagesize=A4, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
+	doc = SimpleDocTemplate(PAR['file'].replace('.fountain', '_SFX.pdf'), pagesize=style.DOC_SIZE, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
 	Story = []
 
 	# iterate through locations and add sounds to the pages
