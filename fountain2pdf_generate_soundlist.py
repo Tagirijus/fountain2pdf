@@ -3,7 +3,7 @@
 import sys, os, fountain, yaml, re
 
 
-DEFAULT_LOCATION = 'HOME'
+DEFAULT_LOCATION = 'DIGITAL'
 
 
 class SFX(object):
@@ -113,15 +113,18 @@ def generateSoundlist(datei):
 
 	# beginn
 	print 'Computing ' + datei + ' ...'
+	print
+	print 'Controls:'
 	print '"exit" = exit, "skip" = continue last session'
-	print '":[NUMBER]" = jump to number, "print" = output.'
+	print '":[NUMBER]" = jump to number, "print" = output'
+	print '"<" = go to previous sound, ">" = go to next sound'
+	print
 	print 'Enter data like this:'
 	print '     "LOCATION=COMMENT"'
 	print '     "LOCATION, LOCATION 2=COMMENT"'
 	print '     "LOCATION"'
 	print '     "LOCATION, LOCATION 2"'
 	print '     "=COMMENT"'
-	print
 
 
 
@@ -136,27 +139,19 @@ def generateSoundlist(datei):
 
 	# asking user stuff and generating the list
 	skip = False
-	skipto = -1
-	for x in sounds:
-		# skip mechanism and check if entry already exists in liste ... skip or not
-		if skipto > 0 and skipto != x.number:
-			done = True
-			skip = True
-		elif skipto == x.number:
-			done = x.done
-			skip = False
-			skipto = -1
-		else:
-			done = x.done
-			skipto = -1
+	THIS = 0
+	while THIS <= len(sounds):
+		# skip mechanism ... skip or not
+		done = sounds[THIS].done
 		if skip and done:
+			THIS += 1
 			continue
 
 		# don't skip
 		else:
 			if done:
-				default 	= ', '.join( x.locations )
-				default_com	= x.comment
+				default 	= ', '.join( sounds[THIS].locations )
+				default_com	= sounds[THIS].comment
 			else:
 				default 	= DEFAULT_LOCATION
 				default_com	= ''
@@ -168,9 +163,10 @@ def generateSoundlist(datei):
 			cats_string += cats + ' (' + str(cats_count+1) + ')'
 			if cats_count+1 < len(categories):
 				cats_string += ', '
+		print
 		print GREY + 'Categories: ' + PURPLE + cats_string
-		print GREY + 'Scene: ' + x.scene + ' #' + x.scenenumber + '#'
-		print YELLOW + str(x.number) + '/' + str(amount) + ': ' + CYAN + x.sound
+		print GREY + 'Scene: ' + sounds[THIS].scene + ' #' + sounds[THIS].scenenumber + '#'
+		print YELLOW + str(sounds[THIS].number) + '/' + str(amount) + ': ' + CYAN + sounds[THIS].sound
 		skip = False
 		user = raw_input(RED + 'Rec-Location [' + BLUE + default + '=' + default_com + RED + '] > ' + CL_E)
 		if user == 'exit':
@@ -180,9 +176,24 @@ def generateSoundlist(datei):
 			skip = True
 		elif len(user) > 0 and user[0] == ':':
 			try:
-				skipto = int(user[1:])
+				THIS = int(user[1:])-1
+				if THIS >= len(sounds):
+					THIS = len(sounds)-1
+				if THIS < 0:
+					THIS = 0
+				continue
 			except Exception:
-				skipto = -1
+				continue
+		elif len(user) > 0 and user[0] == '<':
+			THIS -= 1
+			if THIS < 0:
+				THIS = 0
+			continue
+		elif len(user) > 0 and user[0] == '>':
+			THIS += 1
+			if THIS >= len(sounds):
+				THIS = len(sounds)-1
+			continue
 		elif user == 'print':
 			break
 		else:
@@ -202,16 +213,19 @@ def generateSoundlist(datei):
 				locations.append( loc_user_input )
 
 			# update sound
-			x.locations = locations
-			x.comment = comment
-			x.done = True
+			sounds[THIS].locations = locations
+			sounds[THIS].comment = comment
+			sounds[THIS].done = True
 
 
 			# save list
 			d = open(liste_datei, 'w')
 			d.write( yaml.dump(sounds) )
 			d.close()
-		print
+
+			# go to next item
+			THIS += 1
 
 	# return the soundlist
+	print
 	return sounds

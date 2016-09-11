@@ -346,7 +346,7 @@ def Fountain2SoundlistPDF(fount):
 	AMOUNT = len(SOUNDS)
 
 	# get locations
-	LOCATIONS = getLocations( SOUNDS )
+	LOCATIONS = sorted(getLocations( SOUNDS ))
 
 	# generate doc and empty output-array
 	doc = SimpleDocTemplate(PAR['file'].replace('.fountain', '_SFX.pdf'), pagesize=A4, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
