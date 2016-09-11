@@ -40,7 +40,7 @@ STYLE_TITLEPAGE_CREDIT = ParagraphStyle(
 	'Titlepage Credit',
 	fontName=FONT,
 	fontSize=SIZE*0.75,
-	leading=SIZE*0.75*1.125,
+	leading=SIZE*0.75*1.25,
 	spaceAfter=SIZE*2,
 	alignment=TA_CENTER
 	)
@@ -49,7 +49,7 @@ STYLE_TITLEPAGE_AUTHOR = ParagraphStyle(
 	'Titlepage Author',
 	fontName=FONT,
 	fontSize=SIZE,
-	leading=SIZE*1.125,
+	leading=SIZE*1.25,
 	spaceAfter=SIZE,
 	alignment=TA_CENTER
 	)
@@ -67,7 +67,7 @@ STYLE_TITLEPAGE_CONTACT = ParagraphStyle(
 	fontName=FONTITALIC,
 	fontSize=SIZE,
 	alignment=TA_RIGHT,
-	leading=SIZE*1.125,
+	leading=SIZE*1.25,
 	textColor=grey
 	)
 
@@ -75,7 +75,7 @@ STYLE_SECTION_HEADING = ParagraphStyle(
 	'Section Heading',
 	fontName=FONT,
 	fontSize=SIZE*1.4,
-	leading=SIZE*1.4*1.125,
+	leading=SIZE*1.4*1.25,
 	alignment=TA_CENTER
 	)
 
@@ -101,7 +101,7 @@ STYLE_SCENE_NUMBER_R = ParagraphStyle(
 	'Scene Number Right',
 	fontName=FONTBOLD,
 	fontSize=SIZE,
-	leading=SIZE*1.125,
+	leading=SIZE*1.25,
 	alignment=TA_RIGHT,
 	textTransform='uppercase'
 	)
@@ -121,7 +121,7 @@ STYLE_ACTION = ParagraphStyle(
 	'Action',
 	fontName=FONT,
 	fontSize=SIZE,
-	leading=SIZE*1.125,
+	leading=SIZE*1.25,
 	leftIndent=SIZE*2.5,
 	rightIndent=SIZE*2.5,
 	textColor=grey
@@ -131,7 +131,7 @@ STYLE_CHARACTER = ParagraphStyle(
 	'Character',
 	fontName=FONT,
 	fontSize=SIZE,
-	leading=SIZE*1.125,
+	leading=SIZE*1.25,
 	leftIndent=SIZE*2.5,
 	rightIndent=SIZE*2.5,
 	textTransform='uppercase'
@@ -150,7 +150,7 @@ STYLE_DIALOGUE = ParagraphStyle(
 	'Dialogue',
 	fontName=FONT,
 	fontSize=SIZE,
-	leading=SIZE*1.125,
+	leading=SIZE*1.25,
 	leftIndent=SIZE*2.5+SIZE*1.8,
 	rightIndent=SIZE*2.5
 	)
@@ -159,7 +159,7 @@ STYLE_CHARACTER_MARK = ParagraphStyle(
 	'Character_Mark',
 	fontName=FONT,
 	fontSize=SIZE,
-	leading=SIZE*1.125,
+	leading=SIZE*1.25,
 	leftIndent=SIZE*2.5,
 	rightIndent=SIZE*2.5,
 	textTransform='uppercase',
@@ -181,7 +181,7 @@ STYLE_DIALOGUE_MARK = ParagraphStyle(
 	'Dialogue Mark',
 	fontName=FONT,
 	fontSize=SIZE,
-	leading=SIZE*1.125,
+	leading=SIZE*1.25,
 	leftIndent=SIZE*2.5+SIZE*1.8,
 	rightIndent=SIZE*2.5,
 	backColor=lightgrey
@@ -191,7 +191,7 @@ STYLE_TRANSITION = ParagraphStyle(
 	'Transition',
 	fontName=FONT,
 	fontSize=SIZE,
-	leading=SIZE*1.125,
+	leading=SIZE*1.25,
 	leftIndent=SIZE*2.5,
 	rightIndent=SIZE*2.5,
 	textTransform='uppercase',
