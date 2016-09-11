@@ -84,11 +84,11 @@ def generateSoundlist(datei):
 		return out
 
 	def get_id(array, scene, scenenumber, sound):
-		out = [x.sound for x in array]
+		out = []
 		for y, x in enumerate(array):
 			if x.scene == scene and x.scenenumber == scenenumber and x.sound == sound:
-				return y
-		return 0
+				out.append( y )
+		return out
 
 
 	# check if soundlist for this project already exists and load it, or make an empty one:
@@ -131,10 +131,10 @@ def generateSoundlist(datei):
 	# update actual soundlist from opened fountain with saved YAML
 	for x in liste:
 		if x.scene in [s.scene for s in sounds] and x.scenenumber in [s.scenenumber for s in sounds] and x.sound in [s.sound for s in sounds]:
-			i = get_id(sounds, x.scene, x.scenenumber, x.sound)
-			sounds[i].locations = x.locations
-			sounds[i].comment = x.comment
-			sounds[i].done = x.done
+			for i in get_id(sounds, x.scene, x.scenenumber, x.sound):
+				sounds[i].locations = x.locations
+				sounds[i].comment = x.comment
+				sounds[i].done = x.done
 
 
 	# asking user stuff and generating the list
