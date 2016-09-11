@@ -38,7 +38,7 @@ class Fountain:
     def parse(self):
         self.metadata = dict()
         contents = self.contents.strip().replace('\r', '')
-        if ':' in contents[:20]:
+        if ':' in contents.splitlines()[0]:
             script_head, script_body = contents.split('\n\n', 1)
             self._parse_head(script_head.splitlines())
             self._parse_body(script_body.splitlines())
