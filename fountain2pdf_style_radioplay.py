@@ -140,8 +140,8 @@ STYLE_CHARACTER = ParagraphStyle(
 STYLE_PARENTHETICAL = ParagraphStyle(
 	'Parenthetical',
 	fontName=FONTITALIC,
-	fontSize=SIZE,
-	leading=SIZE*1.125,
+	fontSize=SIZE*0.75,
+	leading=SIZE*0.75*1.25,
 	leftIndent=SIZE*2.5+SIZE*1.8,
 	rightIndent=SIZE*2.5
 	)
@@ -169,8 +169,8 @@ STYLE_CHARACTER_MARK = ParagraphStyle(
 STYLE_PARENTHETICAL_MARK = ParagraphStyle(
 	'Parenthetical Mark',
 	fontName=FONTITALIC,
-	fontSize=SIZE,
-	leading=SIZE*1.125,
+	fontSize=SIZE*0.75,
+	leading=SIZE*0.75*1.25,
 	leftIndent=SIZE*2.5+SIZE*1.8,
 	rightIndent=SIZE*2.5,
 	backColor=lightgrey
