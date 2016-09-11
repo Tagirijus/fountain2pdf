@@ -166,9 +166,13 @@ def generateIndex(fount):
 	return out
 
 
-def getParaHeight(para, withspace=True):
+def resetLeftSpace():
+	return style.DOC_SIZE[1] - style.TOPMARGIN - style.BOTTOMMARGIN - style.SIZE
+
+
+def getParaHeight(para, with_space=True):
 	height = 0
-	if withspace:
+	if with_space:
 		height += para.getSpaceBefore()
 		height += para.getSpaceAfter()
 
@@ -185,7 +189,7 @@ def generateTitlepage(fount):
 	para_author = None
 	para_date = None
 	para_contact = None
-	left_space = style.DOC_SIZE[1] - style.TOPMARGIN - style.BOTTOMMARGIN - style.SIZE
+	left_space = resetLeftSpace()
 	for meta in fount.metadata.iteritems():
 		# get title
 		if meta[0] == 'title':
@@ -270,36 +274,41 @@ def Fountain2PDF(fount, char=None):
 	action_total = countActionSentences(fount)
 
 	# iterate through every fountain element
-	for f in fount.elements:
+	for fc, f in enumerate(fount.elements):
 
 		# it is a section heading
 		if f.element_type == 'Section Heading':
 			# generate anchor for index linking for sections
 			tmp_section_anchor = '<a name="section' + str(section_count) + '" />'
 			section_count += 1
-			Story.append(Paragraph( tmp_section_anchor + f.element_text, style.STYLE_SECTION_HEADING))
+			para_tmp = Paragraph( tmp_section_anchor + f.element_text, style.STYLE_SECTION_HEADING)
+			Story.append( para_tmp )
 			skip_empty_line = False
 
 		# it is a scene heading
 		elif f.element_type == 'Scene Heading':
 			# print scene number on the left, if enabled
 			if style.SCENE_NUMBER_L:
-				Story.append(Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_L))
+				para_tmp = Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_L)
+				Story.append( para_tmp )
 			# get scene abbreviation and print it, if it is not a dot
 			tmp_scene_abb = f.scene_abbreviation + ' ' if f.scene_abbreviation != '.' else ''
 			# generate anchor for index linking for scenes
 			tmp_scene_anchor = '<a name="scene' + str(scene_count) + '" />'
 			scene_count += 1
-			Story.append(Paragraph( tmp_scene_anchor + tmp_scene_abb + f.element_text, style.STYLE_SCENE_HEADING))
+			para_tmp = Paragraph( tmp_scene_anchor + tmp_scene_abb + f.element_text, style.STYLE_SCENE_HEADING)
+			Story.append( para_tmp )
 			# print scene number on the left, if enabled
 			if style.SCENE_NUMBER_R:
-				Story.append(Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_R))
+				para_tmp = Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_R)
+				Story.append( para_tmp )
 			skip_empty_line = False
 
 		# it is a comment / a note
 		elif f.element_type == 'Comment':
 			if PAR['notes']:
-				Story.append(Paragraph( '[ ' + Fountain2HTML( f.element_text ) + ' ]', style.STYLE_COMMENT))
+				para_tmp = Paragraph( '[ ' + Fountain2HTML( f.element_text ) + ' ]', style.STYLE_COMMENT)
+				Story.append( para_tmp )
 			else:
 				skip_empty_line = True
 
@@ -317,44 +326,53 @@ def Fountain2PDF(fount, char=None):
 					action_sentence += 1
 			else:
 				tmp_action = f.element_text
-			Story.append(Paragraph( Fountain2HTML( tmp_action ), style.STYLE_ACTION))
+			para_tmp = Paragraph( Fountain2HTML( tmp_action ), style.STYLE_ACTION)
+			Story.append( para_tmp )
 			skip_empty_line = False
 
 		# it is a character
 		elif f.element_type == 'Character':
 			if mark and f.element_text == char:
-				Story.append(Paragraph( f.element_text, style.STYLE_CHARACTER_MARK))
+				para_tmp = Paragraph( f.element_text, style.STYLE_CHARACTER_MARK)
+				Story.append( para_tmp )
 				mark_char = True
 			else:
-				Story.append(Paragraph( f.element_text, style.STYLE_CHARACTER))
+				para_tmp = Paragraph( f.element_text, style.STYLE_CHARACTER)
+				Story.append( para_tmp )
 				mark_char = False
 			skip_empty_line = False
 
 		# it is a parenthetical
 		elif f.element_type == 'Parenthetical':
 			if mark and mark_char:
-				Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL_MARK))
+				para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL_MARK)
+				Story.append( para_tmp )
 			else:
-				Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL))
+				para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL)
+				Story.append( para_tmp )
 			skip_empty_line = False
 
 		# it is dialogue
 		elif f.element_type == 'Dialogue':
 			if mark and mark_char:
-				Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE_MARK))
+				para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE_MARK)
+				Story.append( para_tmp )
 			else:
-				Story.append(Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE))
+				para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE)
+				Story.append( para_tmp )
 			skip_empty_line = False
 
 		# it is a transition
 		elif f.element_type == 'Transition':
-			Story.append(Paragraph( f.element_text, style.STYLE_TRANSITION))
+			para_tmp = Paragraph( f.element_text, style.STYLE_TRANSITION)
+			Story.append( para_tmp )
 			skip_empty_line = False
 
 		# it is an empty line
 		elif f.element_type == 'Empty Line':
 			if style.PRINT_EMPTY_LINES and not skip_empty_line:
-				Story.append(Paragraph('&nbsp;', style.STYLE_EMPTY_LINE))
+				para_tmp = Paragraph('&nbsp;', style.STYLE_EMPTY_LINE)
+				Story.append( para_tmp )
 				skip_empty_line = False
 
 		# it is a page break
@@ -373,6 +391,7 @@ def Fountain2PDF(fount, char=None):
 			# TO DO !!!
 			pass
 			#skip_empty_line = False
+
 
 	# get title and save to PDF
 	if char:
