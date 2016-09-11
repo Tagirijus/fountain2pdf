@@ -2,13 +2,17 @@
 
 import sys, os, fountain, yaml, re
 
+
+DEFAULT_LOCATION = 'HOME'
+
+
 class SFX(object):
 	def __init__(self, scene, scenenumber, sound, number, locations=[],  comment='', done=False):
 		self.scene = scene # string
 		self.scenenumber = scenenumber # string
 		self.sound = sound # string
 		self.number = number # integer
-		self.locations = locations # array
+		self.locations = [DEFAULT_LOCATION] if len(locations) == 0 else locations # array
 		self.comment = comment # string
 		self.done = done # bool
 
@@ -49,8 +53,6 @@ def getSoundsFromFountain(fount):
 
 
 def generateSoundlist(datei):
-	DEFAULT_LOCATION = 'HOME'
-
 	WHITE = '\033[97m'
 	PURPLE = '\033[95m'
 	BLUE = '\033[94m'
