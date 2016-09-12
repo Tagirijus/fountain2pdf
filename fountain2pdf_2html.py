@@ -89,8 +89,12 @@ class Asteriks(object):
 
 styles = (Asteriks, BoldItalic, Bold, Italic, Underline)
 
-def Fountain2HTML(text):
+def Fountain2HTML(text, plaintext=False):
 	out = text
-	for x in styles:
-		out = x.parse_re.sub(x.start_html + r'\1' + x.end_html , out)
+	if not plaintext:
+		for x in styles:
+			out = x.parse_re.sub(x.start_html + r'\1' + x.end_html , out)
+	else:
+		for x in styles:
+			out = x.parse_re.sub(r'\1' , out)
 	return out

@@ -1,5 +1,7 @@
 # coding=utf-8
 
+DEFAULT_AUTHOR = 'Manuel Senfft'
+
 import fountain2pdf_style_radioplay as style # define your style here
 
 import fountain2pdf_generate_soundlist
@@ -393,11 +395,37 @@ def Fountain2PDF(fount, char=None):
 			#skip_empty_line = False
 
 
-	# get title and save to PDF
-	if char:
-		doc.title = PAR['file'].replace('.fountain', ': ' + char)
+	# get title
+	if 'title' in fount.metadata:
+		doc.title = ', '.join( [Fountain2HTML(x,True) for x in fount.metadata['title']] )
 	else:
-		doc.title = PAR['file'].replace('.fountain', '')
+		if char:
+			doc.title = PAR['file'].replace('.fountain', ': ' + char)
+		else:
+			doc.title = PAR['file'].replace('.fountain', '')
+
+	# get author
+	if 'author' in fount.metadata:
+			doc.author = ', '.join( [Fountain2HTML(x,True) for x in fount.metadata['author']] )
+	else:
+		doc.author = DEFAULT_AUTHOR
+	doc.creator = doc.author
+
+	# get description
+	if 'subject' in fount.metadata:
+		doc.subject = ', '.join( [Fountain2HTML(x,True) for x in fount.metadata['subject']] )
+
+	# get tags
+	if 'tags' in fount.metadata:
+		doc.keywords = fount.metadata['tags']
+	elif 'tag' in fount.metadata:
+		doc.keywords = fount.metadata['tag']
+	elif 'keywords' in fount.metadata:
+		doc.keywords = fount.metadata['keywords']
+	elif 'keyword' in fount.metadata:
+		doc.keywords = fount.metadata['keyword']
+
+	# save to PDF
 	doc.build(Story, canvasmaker=NumberedCanvas)
 
 
@@ -460,8 +488,34 @@ def Fountain2SoundlistPDF(fount):
 				Story.append(Paragraph( '( ' + zero(sfx.number,AMOUNT) + ' )  ' + sfx.sound, style.STYLE_SOUNDLIST_SOUND))
 				Story.append(PageBreak())
 
-	# get title and save to PDF
-	doc.title = PAR['file'].replace('.fountain', ': SFX')
+	# get title
+	if 'title' in fount.metadata:
+		doc.title = ', '.join( [Fountain2HTML(x,True) for x in fount.metadata['title']] ) + ': SFX'
+	else:
+		doc.title = PAR['file'].replace('.fountain', ': SFX')
+
+	# get author
+	if 'author' in fount.metadata:
+			doc.author = ', '.join( [Fountain2HTML(x,True) for x in fount.metadata['author']] )
+	else:
+		doc.author = DEFAULT_AUTHOR
+	doc.creator = doc.author
+
+	# get description
+	if 'subject' in fount.metadata:
+		doc.subject = ', '.join( [Fountain2HTML(x,True) for x in fount.metadata['subject']] )
+
+	# get tags
+	if 'tags' in fount.metadata:
+		doc.keywords = fount.metadata['tags']
+	elif 'tag' in fount.metadata:
+		doc.keywords = fount.metadata['tag']
+	elif 'keywords' in fount.metadata:
+		doc.keywords = fount.metadata['keywords']
+	elif 'keyword' in fount.metadata:
+		doc.keywords = fount.metadata['keyword']
+
+	# save to PDF
 	doc.build(Story, canvasmaker=NumberedCanvas)
 
 
