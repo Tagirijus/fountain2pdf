@@ -228,6 +228,16 @@ STYLE_INDEX_SCENE = ParagraphStyle(
 	spaceAfter=SIZE*1.5
 	)
 
+STYLE_INDEX_LOCATION = ParagraphStyle(
+	'Index Location',
+	fontName=FONT,
+	fontSize=SIZE*3,
+	leading=SIZE*3.5,
+	leftIndent=SIZE*4,
+	rightIndent=SIZE*4,
+	spaceAfter=SIZE*3
+	)
+
 STYLE_SOUNDLIST_LOCATION_HEAD = ParagraphStyle(
 	'Soundlist Location Head',
 	fontName=FONT,

@@ -474,8 +474,9 @@ def Fountain2SoundlistPDF(fount):
 	# generate index for locations
 	loc_num = 0
 	for x in LOCATIONS:
-		Story.append(Paragraph('<a href = location' + str(loc_num) + '><u>' + x + '</u></a>', style.STYLE_INDEX_SCENE))
+		Story.append(Paragraph('<a href = location' + str(loc_num) + '><u>' + x + '</u></a>', style.STYLE_INDEX_LOCATION))
 		loc_num += 1
+	Story.append(PageBreak())
 
 	# generate doc and empty output-array
 	doc = SimpleDocTemplate(PAR['file'].replace('.fountain', '_SFX.pdf'), pagesize=style.DOC_SIZE, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
