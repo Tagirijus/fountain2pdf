@@ -462,6 +462,8 @@ def getLocations(SFXList):
 	return locs
 
 def Fountain2SoundlistPDF(fount):
+	Story = []
+
 	# get / generate list of sounds
 	SOUNDS = fountain2pdf_generate_soundlist.generateSoundlist(PAR['file'])
 	AMOUNT = len(SOUNDS)
@@ -469,13 +471,20 @@ def Fountain2SoundlistPDF(fount):
 	# get locations
 	LOCATIONS = sorted(getLocations( SOUNDS ))
 
+	# generate index for locations
+	loc_num = 0
+	for x in LOCATIONS:
+		Story.append(Paragraph('<a href = location' + str(loc_num) + '><u>' + x + '</u></a>', style.STYLE_INDEX_SCENE))
+		loc_num += 1
+
 	# generate doc and empty output-array
 	doc = SimpleDocTemplate(PAR['file'].replace('.fountain', '_SFX.pdf'), pagesize=style.DOC_SIZE, rightMargin=style.RIGHTMARGIN, leftMargin=style.LEFTMARGIN, topMargin=style.TOPMARGIN, bottomMargin=style.BOTTOMMARGIN)
-	Story = []
 
 	# iterate through locations and add sounds to the pages
+	loc_num = 0
 	for loc in LOCATIONS:
-		Story.append(Paragraph('Location:<br /><br /><br /><b>' + loc + '</b>', style.STYLE_SOUNDLIST_LOCATION_HEAD))
+		Story.append(Paragraph('<a name = location' + str(loc_num) + ' />Location:<br /><br /><br /><b>' + loc + '</b>', style.STYLE_SOUNDLIST_LOCATION_HEAD))
+		loc_num += 1
 		Story.append(PageBreak())
 
 		# iter through all sounds and add one sound per page, if it's in the location
