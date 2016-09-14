@@ -153,15 +153,14 @@ def generateIndex(fount):
 	# TODO: Does not work with links over the same page !!!
 
 	out = []
-	section_count = 1
-	scene_count = 1
-	out.append(Paragraph(PAR['file'].replace('.fountain', ''),style.STYLE_INDEX_TITEL))
+	section_count = 0
+	scene_count = 0
 	for f in fount.elements:
 		if f.element_type == 'Section Heading':
-			out.append(Paragraph( '<a href="document:section' + str(section_count) + '"><u>' + f.element_text + '</u></a>', style.STYLE_INDEX_SECTION ))
+			out.append(Paragraph( '<a href = section' + str(section_count) + '><u>' + f.element_text + '</u></a>', style.STYLE_INDEX_SECTION ))
 			section_count += 1
 		elif f.element_type == 'Scene Heading':
-			out.append(Paragraph( '<a href="document:scene' + str(scene_count) + '"><u>' + f.element_text + ' # ' + f.scene_number + '</u></a>', style.STYLE_INDEX_SCENE ))
+			out.append(Paragraph( '<a href = scene' + str(scene_count) + '><u>' + f.element_text + ' # ' + f.scene_number + '</u></a>', style.STYLE_INDEX_SCENE ))
 			scene_count += 1
 	out.append(PageBreak())
 
@@ -270,8 +269,8 @@ def Fountain2PDF(fount, char=None):
 	# some variables before iteration starts
 	skip_empty_line = False
 	mark_char = False
-	section_count = 1
-	scene_count = 1
+	section_count = 0
+	scene_count = 0
 	action_sentence = 1
 	action_total = countActionSentences(fount)
 
@@ -281,7 +280,7 @@ def Fountain2PDF(fount, char=None):
 		# it is a section heading
 		if f.element_type == 'Section Heading':
 			# generate anchor for index linking for sections
-			tmp_section_anchor = '<a name="section' + str(section_count) + '" />'
+			tmp_section_anchor = '<a name = section' + str(section_count) + ' /> '
 			section_count += 1
 			para_tmp = Paragraph( tmp_section_anchor + f.element_text, style.STYLE_SECTION_HEADING)
 			Story.append( para_tmp )
@@ -296,7 +295,7 @@ def Fountain2PDF(fount, char=None):
 			# get scene abbreviation and print it, if it is not a dot
 			tmp_scene_abb = f.scene_abbreviation + ' ' if f.scene_abbreviation != '.' else ''
 			# generate anchor for index linking for scenes
-			tmp_scene_anchor = '<a name="scene' + str(scene_count) + '" />'
+			tmp_scene_anchor = '<a name = scene' + str(scene_count) + ' /> '
 			scene_count += 1
 			para_tmp = Paragraph( tmp_scene_anchor + tmp_scene_abb + f.element_text, style.STYLE_SCENE_HEADING)
 			Story.append( para_tmp )
@@ -426,7 +425,7 @@ def Fountain2PDF(fount, char=None):
 		doc.keywords = fount.metadata['keyword']
 
 	# save to PDF
-	doc.build(Story, canvasmaker=NumberedCanvas)
+	doc.build(Story) #, canvasmaker=NumberedCanvas)  # disabled, since it breaks links
 
 
 class NumberedCanvas(canvas.Canvas):
@@ -516,7 +515,7 @@ def Fountain2SoundlistPDF(fount):
 		doc.keywords = fount.metadata['keyword']
 
 	# save to PDF
-	doc.build(Story, canvasmaker=NumberedCanvas)
+	doc.build(Story) #, canvasmaker=NumberedCanvas)  # disabled, since it breaks links
 
 
 

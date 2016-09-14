@@ -208,22 +208,14 @@ STYLE_EMPTY_LINE = ParagraphStyle(
 	rightIndent=SIZE*2.5
 	)
 
-STYLE_INDEX_TITEL = ParagraphStyle(
-	'Index Title',
-	fontName=FONTBOLD,
-	fontSize=SIZE*3,
-	leading=SIZE*6,
-	alignment=TA_CENTER,
-	textTransform='uppercase'
-	)
-
 STYLE_INDEX_SECTION = ParagraphStyle(
 	'Index Section',
 	fontName=FONT,
 	fontSize=SIZE*1.5,
 	leading=SIZE*2,
 	leftIndent=SIZE*2.5,
-	rightIndent=SIZE*2.5
+	rightIndent=SIZE*2.5,
+	spaceAfter=SIZE*1.5
 	)
 
 STYLE_INDEX_SCENE = ParagraphStyle(
@@ -232,7 +224,8 @@ STYLE_INDEX_SCENE = ParagraphStyle(
 	fontSize=SIZE*1.5,
 	leading=SIZE*2,
 	leftIndent=SIZE*4,
-	rightIndent=SIZE*4
+	rightIndent=SIZE*4,
+	spaceAfter=SIZE*1.5
 	)
 
 STYLE_SOUNDLIST_LOCATION_HEAD = ParagraphStyle(
