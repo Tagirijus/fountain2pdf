@@ -316,7 +316,7 @@ def Fountain2PDF(fount, char=None):
 		# it is action
 		elif f.element_type == 'Action':
 			tmp_action = ''
-			if PAR['numbers']:
+			if PAR['numbers'] and not '*Musik:' in f.element_text:
 				RE = re.split('(?<=[.!?]) +', f.element_text)
 				for sentnum, sentence in enumerate(RE):
 					if sentnum >= 0 and sentnum <= len(RE):
