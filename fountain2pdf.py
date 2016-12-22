@@ -21,17 +21,23 @@ path_to_project = os.path.dirname(os.path.realpath(__file__))
 # functions
 
 def getProgrammParameters(arr):
-	# possible parameters:
-	# 1st parameter: filename of the source fountain file
-	# -c / -char ["Character Name" / "all"] --> marks one char or all in seperate files
-	# -n / -notes --> enables output for comments/notes
-	# -s / -soundlist --> outputs a soundlist only
-	# -i / -index --> enables first page as index of sections and scenes
-	# -d / -numbers --> enables numbers on the sounds / action sentences
-
 	# quit, if there is not at least one parameter
 	if len(arr) < 2:
 		print 'At least one parameter needed: source fountain file.'
+		exit()
+
+	# help print
+	if '-h' in arr or '-help' in arr:
+		print
+		print 'A Fountain-script to PDF converter.'
+		print '\t1st parameter: filename of the source fountain file'
+		print '\t-c / -char ["Character Name" / "all"] --> marks one char or all in seperate files'
+		print '\t-co / -char-only ["Character Name"] --> prints out text for this character only'
+		print '\t-n / -notes --> enables output for comments/notes'
+		print '\t-s / -soundlist --> outputs a soundlist only'
+		print '\t-i / -index --> enables first page as index of sections and scenes'
+		print '\t-d / -numbers --> enables numbers on the sounds / action sentences'
+		print
 		exit()
 
 	# quit, if the given parameter is not a file
