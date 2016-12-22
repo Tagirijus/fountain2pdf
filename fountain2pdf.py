@@ -59,6 +59,20 @@ def getProgrammParameters(arr):
 	else:
 		output['char'] = None
 
+	# one character only
+	if '-co' in arr:
+		try:
+			output['char_only'] = arr[arr.index('-co')+1]
+		except Exception:
+			output['char_only'] = None
+	elif '-char-only' in arr:
+		try:
+			output['char_only'] = arr[arr.index('-char_only')+1]
+		except Exception:
+			output['char_only'] = None
+	else:
+		output['char_only'] = None
+
 	# the notes
 	if '-n' in arr or '-notes' in arr:
 		output['notes'] = True
@@ -244,15 +258,52 @@ def generateTitlepage(fount):
 	return out
 
 
-def Fountain2PDF(fount, char=None):
-	# generate filename
-	if char and char.upper() in getCharacters(fount):
-		char = char.upper()
-		out_filename = PAR['file'].replace('.fountain', '_'+char.replace(' ', '_')+'.pdf')
-		mark = True
+def genSceneId(fount_element):
+	out = ''
+	if fount_element.element_type == 'Scene Heading':
+		out += str(fount_element.scene_number)
+		out += fount_element.element_text
+		return out
 	else:
-		out_filename = PAR['file'].replace('.fountain', '.pdf')
-		mark = False
+		return False
+
+
+def getCharonlyScenes(fount, charonly):
+	scenes = []
+	for f in fount.elements:
+		if f.element_type == 'Scene Heading':
+			active_scene = genSceneId(f)
+		if f.element_type == 'Character' and charonly != None:
+			if charonly.upper() == f.element_text:
+				scenes.append( active_scene )
+	return scenes
+
+
+def Fountain2PDF(fount, char=None, charonly=None):
+	# generate filename
+	if charonly == None:
+		if char and char.upper() in getCharacters(fount):
+			char = char.upper()
+			out_filename = PAR['file'].replace('.fountain', '_'+char.replace(' ', '_')+'.pdf')
+			mark = True
+		else:
+			out_filename = PAR['file'].replace('.fountain', '.pdf')
+			mark = False
+	else:
+		if charonly and charonly.upper() in getCharacters(fount):
+			charonly = charonly.upper()
+			out_filename = PAR['file'].replace('.fountain', '_'+charonly.replace(' ', '_')+'_ONLY.pdf')
+			# still mark it, when -c is set as well
+			if type(char) == str and char.upper() == charonly.upper():
+				mark = True
+			else:
+				mark = False
+		else:
+			out_filename = PAR['file'].replace('.fountain', '.pdf')
+			mark = False
+
+	# get scenes for charonly character
+	charonly_scenes = getCharonlyScenes(fount, charonly)
 
 
 	# generate doc and empty output-array
@@ -269,6 +320,7 @@ def Fountain2PDF(fount, char=None):
 	# some variables before iteration starts
 	skip_empty_line = False
 	mark_char = False
+	charonly_active = None
 	section_count = 0
 	scene_count = 0
 	action_sentence = 1
@@ -288,22 +340,25 @@ def Fountain2PDF(fount, char=None):
 
 		# it is a scene heading
 		elif f.element_type == 'Scene Heading':
-			# print scene number on the left, if enabled
-			if style.SCENE_NUMBER_L:
-				para_tmp = Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_L)
+			if charonly == None or genSceneId(f) in charonly_scenes:
+				# print scene number on the left, if enabled
+				if style.SCENE_NUMBER_L:
+					para_tmp = Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_L)
+					Story.append( para_tmp )
+				# get scene abbreviation and print it, if it is not a dot
+				tmp_scene_abb = f.scene_abbreviation + ' ' if f.scene_abbreviation != '.' else ''
+				# generate anchor for index linking for scenes
+				tmp_scene_anchor = '<a name = scene' + str(scene_count) + ' /> '
+				scene_count += 1
+				para_tmp = Paragraph( tmp_scene_anchor + tmp_scene_abb + f.element_text, style.STYLE_SCENE_HEADING)
 				Story.append( para_tmp )
-			# get scene abbreviation and print it, if it is not a dot
-			tmp_scene_abb = f.scene_abbreviation + ' ' if f.scene_abbreviation != '.' else ''
-			# generate anchor for index linking for scenes
-			tmp_scene_anchor = '<a name = scene' + str(scene_count) + ' /> '
-			scene_count += 1
-			para_tmp = Paragraph( tmp_scene_anchor + tmp_scene_abb + f.element_text, style.STYLE_SCENE_HEADING)
-			Story.append( para_tmp )
-			# print scene number on the left, if enabled
-			if style.SCENE_NUMBER_R:
-				para_tmp = Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_R)
-				Story.append( para_tmp )
-			skip_empty_line = False
+				# print scene number on the left, if enabled
+				if style.SCENE_NUMBER_R:
+					para_tmp = Paragraph( f.scene_number if f.scene_number != '' else '&nbsp;', style.STYLE_SCENE_NUMBER_R)
+					Story.append( para_tmp )
+				skip_empty_line = False
+			else:
+				skip_empty_line = True
 
 		# it is a comment / a note
 		elif f.element_type == 'Comment':
@@ -315,59 +370,75 @@ def Fountain2PDF(fount, char=None):
 
 		# it is action
 		elif f.element_type == 'Action':
-			tmp_action = ''
-			if PAR['numbers'] and not '*Musik:' in f.element_text:
-				RE = re.split('(?<=[.!?]) +', f.element_text)
-				for sentnum, sentence in enumerate(RE):
-					if sentnum >= 0 and sentnum <= len(RE):
-						tmp_space = ' '
-					else:
-						tmp_space = ''
-					tmp_action += '<strong>' + zero(action_sentence, action_total) + ':</strong> ' + sentence + tmp_space
-					action_sentence += 1
+			if charonly == None:
+				tmp_action = ''
+				if PAR['numbers'] and not '*Musik:' in f.element_text:
+					RE = re.split('(?<=[.!?]) +', f.element_text)
+					for sentnum, sentence in enumerate(RE):
+						if sentnum >= 0 and sentnum <= len(RE):
+							tmp_space = ' '
+						else:
+							tmp_space = ''
+						tmp_action += '<strong>' + zero(action_sentence, action_total) + ':</strong> ' + sentence + tmp_space
+						action_sentence += 1
+				else:
+					tmp_action = f.element_text
+				para_tmp = Paragraph( Fountain2HTML( tmp_action ), style.STYLE_ACTION)
+				Story.append( para_tmp )
+				skip_empty_line = False
 			else:
-				tmp_action = f.element_text
-			para_tmp = Paragraph( Fountain2HTML( tmp_action ), style.STYLE_ACTION)
-			Story.append( para_tmp )
-			skip_empty_line = False
+				skip_empty_line = True
 
 		# it is a character
 		elif f.element_type == 'Character':
-			if mark and f.element_text == char:
-				para_tmp = Paragraph( f.element_text, style.STYLE_CHARACTER_MARK)
-				Story.append( para_tmp )
-				mark_char = True
+			if charonly == None or f.element_text == charonly.upper():
+				if mark and (f.element_text == char or f.element_text == charonly):
+					para_tmp = Paragraph( f.element_text, style.STYLE_CHARACTER_MARK)
+					Story.append( para_tmp )
+					mark_char = True
+				else:
+					para_tmp = Paragraph( f.element_text, style.STYLE_CHARACTER)
+					Story.append( para_tmp )
+					mark_char = False
+				charonly_active = f.element_text
+				skip_empty_line = False
 			else:
-				para_tmp = Paragraph( f.element_text, style.STYLE_CHARACTER)
-				Story.append( para_tmp )
-				mark_char = False
-			skip_empty_line = False
+				charonly_active = None
 
 		# it is a parenthetical
 		elif f.element_type == 'Parenthetical':
-			if mark and mark_char:
-				para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL_MARK)
-				Story.append( para_tmp )
+			if charonly == None or charonly_active == charonly.upper():
+				if mark and mark_char:
+					para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL_MARK)
+					Story.append( para_tmp )
+				else:
+					para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL)
+					Story.append( para_tmp )
+				skip_empty_line = False
 			else:
-				para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_PARENTHETICAL)
-				Story.append( para_tmp )
-			skip_empty_line = False
+				skip_empty_line = True
 
 		# it is dialogue
 		elif f.element_type == 'Dialogue':
-			if mark and mark_char:
-				para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE_MARK)
-				Story.append( para_tmp )
+			if charonly == None or charonly_active == charonly.upper():
+				if mark and mark_char:
+					para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE_MARK)
+					Story.append( para_tmp )
+				else:
+					para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE)
+					Story.append( para_tmp )
+				skip_empty_line = False
 			else:
-				para_tmp = Paragraph( Fountain2HTML( f.element_text ), style.STYLE_DIALOGUE)
-				Story.append( para_tmp )
-			skip_empty_line = False
+				skip_empty_line = True
 
 		# it is a transition
 		elif f.element_type == 'Transition':
-			para_tmp = Paragraph( f.element_text, style.STYLE_TRANSITION)
-			Story.append( para_tmp )
-			skip_empty_line = False
+			if charonly == None:
+				para_tmp = Paragraph( f.element_text, style.STYLE_TRANSITION)
+				Story.append( para_tmp )
+				skip_empty_line = False
+			else:
+				skip_empty_line = True
 
 		# it is an empty line
 		elif f.element_type == 'Empty Line':
@@ -552,10 +623,10 @@ else:
 
 	# check if it should output all characters automatically or not
 	if PAR['char'] == 'all':
-		Fountain2PDF(F)
-		for x in getCharacters(F):
-			Fountain2PDF(F, x)
+		Fountain2PDF(F, charonly=PAR['char_only'])
+		for x in getCharacters(F, charonly=PAR['char_only']):
+			Fountain2PDF(F, x, charonly=PAR['char_only'])
 
 	# make a single script render
 	else:
-		Fountain2PDF(F, PAR['char'])
+		Fountain2PDF(F, PAR['char'], charonly=PAR['char_only'])
