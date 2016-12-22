@@ -162,7 +162,7 @@ def getCharacters(fount):
 def countActionSentences(fount):
 	count = 0
 	for x in fount.elements:
-		if x.element_type == 'Action':
+		if x.element_type == 'Action' and not '*Musik:' in x.element_text:
 			for sentence in re.split('(?<=[.!?]) +', x.element_text):
 				count += 1
 	return count
