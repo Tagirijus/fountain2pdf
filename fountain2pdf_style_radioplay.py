@@ -267,6 +267,17 @@ STYLE_SOUNDLIST_SOUND = ParagraphStyle(
 	leading=SIZE*3
 	)
 
+STYLE_SYNOPSIS = ParagraphStyle(
+	'Synopsis',
+	fontName=FONTITALIC,
+	fontSize=SIZE*0.7,
+	leading=SIZE*0.7,
+	leftIndent=SIZE*6,
+	rightIndent=SIZE*6,
+	textColor=grey,
+	alignment=TA_CENTER
+	)
+
 
 
 # DEFAULT PARAGRAPH STYLE:

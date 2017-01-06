@@ -460,15 +460,16 @@ def Fountain2PDF(fount, char=None, charonly=None):
 
 		# it is a synopsis
 		elif f.element_type == 'Synopsis':
-			# TO DO !!!
-			pass
-			#skip_empty_line = False
+			if PAR['notes']:
+				para_tmp = Paragraph( '~ ' + Fountain2HTML( f.element_text ) + ' ~', style.STYLE_SYNOPSIS)
+				Story.append( para_tmp )
+			else:
+				skip_empty_line = True
 
 		# it is a boneyard
 		elif f.element_type == 'Boneyard':
-			# TO DO !!!
+			# do nothing ... it's just the outcommented boneyard
 			pass
-			#skip_empty_line = False
 
 
 	# get title
