@@ -14,6 +14,7 @@ import sys, os, fountain, re
 
 
 
+only_above = '\n# ToDo' # if this stirng is set, only the whole script ABOVE this string will be rendered
 path_to_project = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -615,10 +616,19 @@ def Fountain2SoundlistPDF(fount):
 # get parameter settings
 PAR = getProgrammParameters(sys.argv)
 
-# get fountain file
+# load fountain file
 d = open(PAR['file'], 'r')
-F = fountain.Fountain( d.read() )
+work_with_me = d.read()
 d.close()
+
+# read only above the given string (only_above)
+if only_above != '' and only_above != ' ':
+	this_text = work_with_me[:work_with_me.find(only_above)]
+else:
+	this_text = work_with_me
+
+# make it a fountain object
+F = fountain.Fountain( this_text )
 
 
 # check if it should output soundlist or not
