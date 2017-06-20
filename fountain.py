@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 fountain.py
 Ported to Python 3 by Colton J. Provias - cj@coltonprovias.com
