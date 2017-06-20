@@ -553,6 +553,7 @@ def Fountain2SoundlistPDF(fount):
 	# generate index for locations
 	loc_num = 0
 	for x in LOCATIONS:
+		x = x.decode(encoding='UTF-8')
 		Story.append(Paragraph('<a href = location' + str(loc_num) + '><u>' + x + '</u></a>', style.STYLE_INDEX_LOCATION))
 		loc_num += 1
 	Story.append(PageBreak())
@@ -563,13 +564,14 @@ def Fountain2SoundlistPDF(fount):
 	# iterate through locations and add sounds to the pages
 	loc_num = 0
 	for loc in LOCATIONS:
+		loc = loc.decode(encoding='UTF-8')
 		Story.append(Paragraph('<a name = location' + str(loc_num) + ' />Location:<br /><br /><br /><b>' + loc + '</b>', style.STYLE_SOUNDLIST_LOCATION_HEAD))
 		loc_num += 1
 		Story.append(PageBreak())
 
 		# iter through all sounds and add one sound per page, if it's in the location
 		for sfx in SOUNDS:
-			if loc in sfx.locations:
+			if loc in [x.decode(encoding='UTF-8') for x in sfx.locations]:
 				Story.append(Paragraph(loc, style.STYLE_SOUNDLIST_LOCATION))
 				Story.append(Paragraph('&nbsp;', style.STYLE_SOUNDLIST_LOCATION))
 				Story.append(Paragraph(sfx.scenenumber + ' - ' + sfx.scene + ' - ' + sfx.scenenumber, style.STYLE_SOUNDLIST_SCENE))
