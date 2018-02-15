@@ -10,7 +10,9 @@ from fountain2pdf_2html import Fountain2HTML
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer
 
-import sys, os, fountain, re
+from fountain import fountain
+
+import sys, os, re
 
 
 

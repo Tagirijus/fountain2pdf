@@ -1,6 +1,7 @@
 # coding=utf-8
 
-import sys, os, fountain, yaml, re
+from fountain import fountain
+import sys, os, yaml, re
 
 
 DEFAULT_LOCATION = 'DIGITAL'
