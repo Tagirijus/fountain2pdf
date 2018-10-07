@@ -645,7 +645,7 @@ else:
 	# check if it should output all characters automatically or not
 	if PAR['char'] == 'all':
 		Fountain2PDF(F, charonly=PAR['char_only'])
-		for x in getCharacters(F, charonly=PAR['char_only']):
+		for x in getCharacters(F):
 			Fountain2PDF(F, x, charonly=PAR['char_only'])
 
 	# make a single script render
