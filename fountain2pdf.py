@@ -339,7 +339,10 @@ def Fountain2PDF(fount, char=None, charonly=None):
 	for fc, f in enumerate(fount.elements):
 
 		# it is a section heading
-		if f.element_type == 'Section Heading':
+		if (
+			f.element_type == 'Section Heading'
+			and f.section_depth != 3
+		):
 			# generate anchor for index linking for sections
 			tmp_section_anchor = '<a name = section' + str(section_count) + ' /> '
 			section_count += 1
