@@ -1,8 +1,12 @@
-# Fountain parser and renderer
+# Fountain parser
 
 ## About
 
-This python script contains a fountain parser `fountain.py` and a renderer `fountain2pdf.py` , which converts .fountain files to .pdf files using the python library [Reportlab](https://pypi.python.org/pypi/reportlab).
+This python script contains a renderer `fountain2pdf.py` , which converts .fountain files to .pdf files using the python library [Reportlab](https://pypi.python.org/pypi/reportlab).
+
+## Install
+
+You need the `fountain` parser installed as a python3 library in the system. You can find it here: https://github.com/Tagirijus/fountain.
 
 ## Usage
 
