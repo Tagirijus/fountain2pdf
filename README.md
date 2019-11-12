@@ -28,6 +28,10 @@ The parameter `-i` or `-index` will generate some kind of index with hyper links
 
 The parameter `-d` or `-numbers` and the parameter `-s` or `-soundlist` are some personal parameters. They are for my personal workflow of radio play production. The first mentioned parameter numbers all the action sentences in the script with ascending numbers. The other parameter starts another script with which I can generate a soundlist and categorize sounds I would have to record for my radio play.
 
+## Style
+
+Please look at `fountain2pdf_style_radioplay.py` how to set up a style. This file can be modified or a new one can be generated and the line 1 from `fountain2pdf.py` should be modified as well then to get your new style.
+
 ## Additional information
 
 First I did not want to make this script public, but now I did. Keep in mind that I do not have that much time for improving things a lot or writing good documentation about these scripts. I primary made the scripts for my personal workflow.
