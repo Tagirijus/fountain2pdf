@@ -325,26 +325,24 @@ def Fountain2PDF(fount, char=None, charonly=None):
     if charonly is None:
         if char and char.upper() in getCharacters(fount):
             char = char.upper()
-            out_filename = PAR['file'].replace(
-                '.fountain', '_' + char.replace(' ', '_') + '.pdf'
-            )
+            out_filename = os.path.splitext(PAR['file'])[0] + \
+                '_' + char.replace(' ', '_') + '.pdf'
             mark = True
         else:
-            out_filename = PAR['file'].replace('.fountain', '.pdf')
+            out_filename = os.path.splitext(PAR['file'])[0] + '.pdf'
             mark = False
     else:
         if charonly and charonly.upper() in getCharacters(fount):
             charonly = charonly.upper()
-            out_filename = PAR['file'].replace(
-                '.fountain', '_' + charonly.replace(' ', '_') + '_ONLY.pdf'
-            )
+            out_filename = os.path.splitext(PAR['file'])[0] + \
+                '_' + charonly.replace(' ', '_') + '_ONLY.pdf'
             # still mark it, when -c is set as well
             if type(char) == str and char.upper() == charonly.upper():
                 mark = True
             else:
                 mark = False
         else:
-            out_filename = PAR['file'].replace('.fountain', '.pdf')
+            out_filename = os.path.splitext(PAR['file'])[0] + '.pdf'
             mark = False
 
     # get scenes for charonly character
@@ -555,9 +553,9 @@ def Fountain2PDF(fount, char=None, charonly=None):
         )
     else:
         if char:
-            doc.title = PAR['file'].replace('.fountain', ': ' + char)
+            doc.title = os.path.splitext(PAR['file'])[0] + ': ' + char
         else:
-            doc.title = PAR['file'].replace('.fountain', '')
+            doc.title = os.path.splitext(PAR['file'])[0]
 
     # get author
     if 'author' in fount.metadata:
@@ -648,7 +646,7 @@ def Fountain2SoundlistPDF(fount):
 
     # generate doc and empty output-array
     doc = SimpleDocTemplate(
-        PAR['file'].replace('.fountain', '_SFX.pdf'),
+        os.path.splitext(PAR['file'])[0] + '_SFX.pdf',
         pagesize=style.DOC_SIZE,
         rightMargin=style.RIGHTMARGIN,
         leftMargin=style.LEFTMARGIN,
@@ -696,7 +694,7 @@ def Fountain2SoundlistPDF(fount):
             [Fountain2HTML(x, True) for x in fount.metadata['title']]
         ) + ': SFX'
     else:
-        doc.title = PAR['file'].replace('.fountain', ': SFX')
+        doc.title = os.path.splitext(PAR['file'])[0] + ': SFX'
 
     # get author
     if 'author' in fount.metadata:
