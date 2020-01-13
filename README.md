@@ -37,7 +37,3 @@ Please look at `fountain2pdf_style_radioplay.py` how to set up a style. This fil
 First I did not want to make this script public, but now I did. Keep in mind that I do not have that much time for improving things a lot or writing good documentation about these scripts. I primary made the scripts for my personal workflow.
 
 Speaking of my personal workflow: take a look at [Fountainhead](https://github.com/derickc/Fountainhead). It is a sublime text plugin and script highlighting I am working with. It is really great and you should not miss it, when you like to write scripts with fountain syntax!
-
-## ToDo
-
-Rewrite everything in Python 3 with flake8 style guide enforcement ...
