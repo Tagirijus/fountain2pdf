@@ -42,6 +42,7 @@ def getProgrammParameters(arr):
             'prints out text for this character only'
         )
         print('\t-n / -notes --> enables output for comments/notes')
+        print('\t-y / -synopsis --> enables output for synopsis')
         print('\t-s / -soundlist --> outputs a soundlist only')
         print('\t-i / -index --> enables first page as index of sections and scenes')
         print('\t-d / -numbers --> enables numbers on the sounds / action sentences')
@@ -92,6 +93,12 @@ def getProgrammParameters(arr):
         output['notes'] = True
     else:
         output['notes'] = False
+
+    # the synopsis
+    if '-y' in arr or '-synopsis' in arr:
+        output['synopsis'] = True
+    else:
+        output['synopsis'] = False
 
     # the soundlist
     if '-s' in arr or '-soundlist' in arr:
@@ -533,7 +540,7 @@ def Fountain2PDF(fount, char=None, charonly=None):
 
         # it is a synopsis
         elif f.element_type == 'Synopsis':
-            if PAR['notes']:
+            if PAR['synopsis']:
                 para_tmp = Paragraph(
                     '~ ' + Fountain2HTML(f.element_text) + ' ~', style.STYLE_SYNOPSIS
                 )
