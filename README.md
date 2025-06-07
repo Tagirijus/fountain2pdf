@@ -4,6 +4,8 @@
 
 This python script contains a renderer `fountain2pdf.py` , which converts .fountain files to .pdf files using the python library [Reportlab](https://pypi.python.org/pypi/reportlab).
 
+**Diclaimer:** these days I normally code way cleaner. This code base is a total mess, for sure! Sorry for that. I'd love to find the time to re-code the whole thing in a way cleaner way and maybe even with an alternative to _reportlab_, but ... yeah, time ... in the meantime I try to almost monkey-patch things so that I get the code to do what I want, or to fix bugs or so. Thanks for understanding.
+
 ## Install
 
 You need the `fountain` parser installed as a python3 library in the system. You can find it here: https://github.com/Tagirijus/fountain.
