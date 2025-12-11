@@ -38,8 +38,9 @@ def getProgrammParameters(arr):
             'marks one char or all in seperate files'
         )
         print(
-            '\t-co / -char-only ["Character Name"] --> '
-            'prints out text for this character only'
+            '\t-co / -char-only ["Character Name" / "all"] --> '
+            'prints out text for this character only; '
+            'with "all" it makes this for every character'
         )
         print('\t-n / -notes --> enables output for comments/notes')
         print('\t-y / -synopsis --> enables output for synopsis')
@@ -762,9 +763,15 @@ else:
 
     # check if it should output all characters automatically or not
     if PAR['char'] == 'all':
-        Fountain2PDF(F, charonly=PAR['char_only'])
+        Fountain2PDF(F)
         for x in getCharacters(F):
-            Fountain2PDF(F, x, charonly=PAR['char_only'])
+            Fountain2PDF(F, x)
+
+    # check if it should output all characters in "only mode" automatically or not
+    elif PAR['char_only'] == 'all':
+        Fountain2PDF(F)
+        for x in getCharacters(F):
+            Fountain2PDF(F, charonly=x)
 
     # make a single script render
     else:
